@@ -5,7 +5,7 @@
 - **框架**：Express.js
 - **資料庫**：Supabase（PostgreSQL）
 - **API 文件**：Swagger UI
-- **架構模式**：業務模組化 MVC
+- **架構模式**：[業務模組化 MVC](MVCREADME.md)
 
 ```
 src/
