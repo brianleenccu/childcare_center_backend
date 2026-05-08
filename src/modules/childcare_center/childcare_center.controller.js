@@ -2,11 +2,8 @@ const service = require('./childcare_center.service');
 
 const getAll = async (req, res) => {
   try {
-    const result = await service.getAll({
-      page: Number(req.query.page) || 1,
-      limit: Number(req.query.limit) || 20,
-    });
-    res.json(result);
+    const data = await service.getAll();
+    res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -49,4 +46,23 @@ const remove = async (req, res) => {
   }
 };
 
-module.exports = { getAll, getById, create, update, remove };
+const searchByCapacity = async (req, res) => {
+  try {
+    const data = await service.searchByCapacity(req.query.range);
+    res.json(data);
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message });
+  }
+};
+
+const searchByOperationType = async (req, res) => {
+  try {
+    if (!req.query.type) return res.status(400).json({ error: 'type is required' });
+    const data = await service.searchByOperationType(req.query.type);
+    res.json(data);
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message });
+  }
+};
+
+module.exports = { getAll, getById, create, update, remove, searchByCapacity, searchByOperationType };

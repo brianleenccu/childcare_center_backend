@@ -20,6 +20,21 @@ src/
     └── <domain>.routes.js
 ```
 
+## 套件安裝
+
+```bash
+npm install
+```
+
+| 套件 | 類型 | 用途 |
+|------|------|------|
+| `express` | 正式 | Web 框架 |
+| `@supabase/supabase-js` | 正式 | Supabase 資料庫客戶端 |
+| `dotenv` | 正式 | 讀取 `.env` 環境變數 |
+| `swagger-jsdoc` | 正式 | 從 JSDoc 註解產生 Swagger 規格 |
+| `swagger-ui-express` | 正式 | 提供 Swagger UI 文件頁面 |
+| `nodemon` | 開發 | 程式碼變更時自動重啟伺服器 |
+
 ## 環境設定
 
 ```bash

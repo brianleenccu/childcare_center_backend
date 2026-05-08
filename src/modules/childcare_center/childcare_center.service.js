@@ -1,6 +1,6 @@
 const model = require('./childcare_center.model');
 
-const getAll = (query) => model.findAll(query);
+const getAll = () => model.findAll();
 
 const getById = async (id) => {
   const center = await model.findById(id);
@@ -20,4 +20,8 @@ const deleteCenter = async (id) => {
   return model.remove(id);
 };
 
-module.exports = { getAll, getById, createCenter, updateCenter, deleteCenter };
+const searchByCapacity = (range) => model.findByCapacityRange(range);
+
+const searchByOperationType = (type) => model.findByOperationType(type);
+
+module.exports = { getAll, getById, createCenter, updateCenter, deleteCenter, searchByCapacity, searchByOperationType };

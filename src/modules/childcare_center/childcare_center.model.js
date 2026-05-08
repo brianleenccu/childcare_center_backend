@@ -1,55 +1,78 @@
-const supabase = require('../../core/config/supabase');
+const pool = require('../../core/config/db');
 
 const TABLE = 'childcare_center';
 
-const findAll = async ({ page = 1, limit = 20 } = {}) => {
-  const from = (page - 1) * limit;
-  const to = from + limit - 1;
-  const { data, error, count } = await supabase
-    .from(TABLE)
-    .select('*', { count: 'exact' })
-    .range(from, to);
-  if (error) throw error;
-  return { data, count };
+const findAll = async () => {
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} ORDER BY center_id`
+  );
+  return result.rows;
 };
 
 const findById = async (id) => {
-  const { data, error } = await supabase
-    .from(TABLE)
-    .select('*')
-    .eq('center_id', id)
-    .maybeSingle();
-  if (error) throw error;
-  return data;
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} WHERE center_id = $1`,
+    [id]
+  );
+  return result.rows[0] || null;
 };
 
 const create = async (payload) => {
-  const { data, error } = await supabase
-    .from(TABLE)
-    .insert(payload)
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
+  const keys = Object.keys(payload);
+  const values = Object.values(payload);
+  const cols = keys.join(', ');
+  const params = keys.map((_, i) => `$${i + 1}`).join(', ');
+
+  const result = await pool.query(
+    `INSERT INTO ${TABLE} (${cols}) VALUES (${params}) RETURNING *`,
+    values
+  );
+  return result.rows[0];
 };
 
 const update = async (id, payload) => {
-  const { data, error } = await supabase
-    .from(TABLE)
-    .update(payload)
-    .eq('center_id', id)
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
+  const keys = Object.keys(payload);
+  const values = Object.values(payload);
+  const set = keys.map((k, i) => `${k} = $${i + 1}`).join(', ');
+
+  const result = await pool.query(
+    `UPDATE ${TABLE} SET ${set} WHERE center_id = $${keys.length + 1} RETURNING *`,
+    [...values, id]
+  );
+  return result.rows[0];
 };
 
 const remove = async (id) => {
-  const { error } = await supabase
-    .from(TABLE)
-    .delete()
-    .eq('center_id', id);
-  if (error) throw error;
+  await pool.query(
+    `DELETE FROM ${TABLE} WHERE center_id = $1`,
+    [id]
+  );
 };
 
-module.exports = { findAll, findById, create, update, remove };
+const CAPACITY_RANGES = {
+  '1-15':  { min: 1,  max: 15 },
+  '16-30': { min: 16, max: 30 },
+  '31-45': { min: 31, max: 45 },
+  '46-60': { min: 46, max: 60 },
+};
+
+const findByCapacityRange = async (range) => {
+  const bounds = CAPACITY_RANGES[range];
+  if (!bounds) throw Object.assign(new Error(`Invalid range. Valid values: ${Object.keys(CAPACITY_RANGES).join(', ')}`), { status: 400 });
+
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} WHERE total_capacity BETWEEN $1 AND $2 ORDER BY center_id`,
+    [bounds.min, bounds.max]
+  );
+  return result.rows;
+};
+
+const findByOperationType = async (type) => {
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} WHERE operation_type = $1 ORDER BY center_id`,
+    [type]
+  );
+  return result.rows;
+};
+
+module.exports = { findAll, findById, create, update, remove, findByCapacityRange, findByOperationType };

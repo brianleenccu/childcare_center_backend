@@ -99,36 +99,73 @@ const router = Router();
  *   get:
  *     summary: List all childcare centers
  *     tags: [ChildcareCenter]
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *         description: Page number
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 20
- *         description: Items per page
  *     responses:
  *       200:
- *         description: Paginated list of childcare centers
+ *         description: All childcare centers
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/ChildcareCenter'
- *                 count:
- *                   type: integer
- *                   description: Total number of records
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ChildcareCenter'
  */
 router.get('/', ctrl.getAll);
+
+/**
+ * @swagger
+ * /api/childcare-centers/search/capacity:
+ *   get:
+ *     summary: Filter childcare centers by total capacity range
+ *     tags: [ChildcareCenter]
+ *     parameters:
+ *       - in: query
+ *         name: range
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [1-15, 16-30, 31-45, 46-60]
+ *         description: Capacity range to filter by
+ *     responses:
+ *       200:
+ *         description: List of matching childcare centers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ChildcareCenter'
+ *       400:
+ *         description: Invalid range value
+ */
+router.get('/search/capacity', ctrl.searchByCapacity);
+
+/**
+ * @swagger
+ * /api/childcare-centers/search/operation-type:
+ *   get:
+ *     summary: Filter childcare centers by operation type
+ *     tags: [ChildcareCenter]
+ *     parameters:
+ *       - in: query
+ *         name: type
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [公立, 私立]
+ *         description: Operation type to filter by
+ *     responses:
+ *       200:
+ *         description: List of matching childcare centers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ChildcareCenter'
+ *       400:
+ *         description: type parameter is required
+ */
+router.get('/search/operation-type', ctrl.searchByOperationType);
 
 /**
  * @swagger
