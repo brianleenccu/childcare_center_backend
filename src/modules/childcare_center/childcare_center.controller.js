@@ -65,4 +65,24 @@ const searchByOperationType = async (req, res) => {
   }
 };
 
-module.exports = { getAll, getById, create, update, remove, searchByCapacity, searchByOperationType };
+const searchByDistrict = async (req, res) => {
+  try {
+    if (!req.query.district) return res.status(400).json({ error: 'district is required' });
+    const data = await service.searchByDistrict(req.query.district);
+    res.json(data);
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message });
+  }
+};
+
+const searchByCategory = async (req, res) => {
+  try {
+    if (!req.query.category) return res.status(400).json({ error: 'category is required' });
+    const data = await service.searchByCategory(req.query.category);
+    res.json(data);
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message });
+  }
+};
+
+module.exports = { getAll, getById, create, update, remove, searchByCapacity, searchByOperationType, searchByDistrict, searchByCategory };

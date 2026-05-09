@@ -75,4 +75,40 @@ const findByOperationType = async (type) => {
   return result.rows;
 };
 
-module.exports = { findAll, findById, create, update, remove, findByCapacityRange, findByOperationType };
+const CATEGORIES = new Set(['托嬰中心', '幼兒園', '托兒所']);
+
+const findByCategory = async (category) => {
+  if (!CATEGORIES.has(category)) {
+    throw Object.assign(
+      new Error(`Invalid category. Valid values: ${[...CATEGORIES].join(', ')}`),
+      { status: 400 }
+    );
+  }
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} WHERE category = $1 ORDER BY center_id`,
+    [category]
+  );
+  return result.rows;
+};
+
+const TAIPEI_DISTRICTS = new Set([
+  '中正區', '萬華區', '大同區', '中山區',
+  '松山區', '大安區', '信義區', '內湖區',
+  '南港區', '士林區', '北投區', '文山區',
+]);
+
+const findByDistrict = async (district) => {
+  if (!TAIPEI_DISTRICTS.has(district)) {
+    throw Object.assign(
+      new Error(`Invalid district. Valid values: ${[...TAIPEI_DISTRICTS].join(', ')}`),
+      { status: 400 }
+    );
+  }
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} WHERE district = $1 ORDER BY center_id`,
+    [district]
+  );
+  return result.rows;
+};
+
+module.exports = { findAll, findById, create, update, remove, findByCapacityRange, findByOperationType, findByCategory, findByDistrict };

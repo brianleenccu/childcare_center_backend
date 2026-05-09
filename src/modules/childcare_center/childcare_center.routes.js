@@ -36,8 +36,6 @@ const router = Router();
  *           type: string
  *         phone:
  *           type: string
- *         operating_hours:
- *           type: string
  *         total_capacity:
  *           type: integer
  *         teacher_student_ratio:
@@ -47,9 +45,18 @@ const router = Router();
  *           type: string
  *         qualification:
  *           type: string
+ *         open_time:
+ *           type: string
+ *           example: "07:30:00"
+ *         close_time:
+ *           type: string
+ *           example: "18:30:00"
+ *         centeraccount_id:
+ *           type: integer
  *         updated_at:
  *           type: string
- *           format: date-time
+ *           example: "2024-06-01 02:00:00"
+ *           description: "timestamp format: YYYY-MM-DD HH:MM:SS"
  *         created_at:
  *           type: string
  *           format: date
@@ -80,8 +87,6 @@ const router = Router();
  *           type: string
  *         phone:
  *           type: string
- *         operating_hours:
- *           type: string
  *         total_capacity:
  *           type: integer
  *         teacher_student_ratio:
@@ -91,6 +96,20 @@ const router = Router();
  *           type: string
  *         qualification:
  *           type: string
+ *         open_time:
+ *           type: string
+ *           example: "07:30:00"
+ *         close_time:
+ *           type: string
+ *           example: "18:30:00"
+ *         centeraccount_id:
+ *           type: integer
+ *         updated_at:
+ *           type: string
+ *           example: "2024-06-01 02:00:00"
+ *         created_at:
+ *           type: string
+ *           format: date
  */
 
 /**
@@ -166,6 +185,62 @@ router.get('/search/capacity', ctrl.searchByCapacity);
  *         description: type parameter is required
  */
 router.get('/search/operation-type', ctrl.searchByOperationType);
+
+/**
+ * @swagger
+ * /api/childcare-centers/search/category:
+ *   get:
+ *     summary: Filter childcare centers by category
+ *     tags: [ChildcareCenter]
+ *     parameters:
+ *       - in: query
+ *         name: category
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [托嬰中心, 幼兒園, 托兒所]
+ *         description: Category to filter by
+ *     responses:
+ *       200:
+ *         description: List of matching childcare centers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ChildcareCenter'
+ *       400:
+ *         description: Invalid or missing category value
+ */
+router.get('/search/category', ctrl.searchByCategory);
+
+/**
+ * @swagger
+ * /api/childcare-centers/search/district:
+ *   get:
+ *     summary: Filter childcare centers by Taipei district
+ *     tags: [ChildcareCenter]
+ *     parameters:
+ *       - in: query
+ *         name: district
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [中正區, 萬華區, 大同區, 中山區, 松山區, 大安區, 信義區, 內湖區, 南港區, 士林區, 北投區, 文山區]
+ *         description: Taipei district to filter by
+ *     responses:
+ *       200:
+ *         description: List of matching childcare centers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ChildcareCenter'
+ *       400:
+ *         description: Invalid or missing district value
+ */
+router.get('/search/district', ctrl.searchByDistrict);
 
 /**
  * @swagger

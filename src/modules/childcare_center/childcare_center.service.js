@@ -24,4 +24,8 @@ const searchByCapacity = (range) => model.findByCapacityRange(range);
 
 const searchByOperationType = (type) => model.findByOperationType(type);
 
-module.exports = { getAll, getById, createCenter, updateCenter, deleteCenter, searchByCapacity, searchByOperationType };
+const searchByDistrict = (district) => model.findByDistrict(district);
+
+const searchByCategory = (category) => model.findByCategory(category);
+
+module.exports = { getAll, getById, createCenter, updateCenter, deleteCenter, searchByCapacity, searchByOperationType, searchByDistrict, searchByCategory };
