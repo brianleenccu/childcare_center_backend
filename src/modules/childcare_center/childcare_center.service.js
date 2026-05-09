@@ -11,12 +11,12 @@ const getById = async (id) => {
 const createCenter = (payload) => model.create(payload);
 
 const updateCenter = async (id, payload) => {
-  await getById(id);
+  await getById(id);                // 等查完，如果找不到會 throw 404
   return model.update(id, payload);
 };
 
 const deleteCenter = async (id) => {
-  await getById(id);
+  await getById(id);                 // 等查完，如果找不到會 throw 404
   return model.remove(id);
 };
 
