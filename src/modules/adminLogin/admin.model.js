@@ -15,19 +15,18 @@ const createAdminRecord = async (payload) => {
 
   // 使用參數化查詢，順序必須嚴格對應 $1 ~ $6
   const sql = `
-    INSERT INTO administrator (center_id, username, email, password, is_verified, created_at)
-    VALUES ($1::int8, $2::text, $3::text, $4::text, $5::boolean, $6::timestamp)
+    INSERT INTO administrator ( username, email, password, is_verified, created_at)
+    VALUES ( $1::text, $2::text, $3::text, $4::boolean, $5::timestamp)
     RETURNING *;
   `;
 
   // 將資料轉為陣列傳遞給 exec_sql
   const result = await executeSql(sql, [
-    center_id, // $1
-    username, // $2
-    email, // $3
-    password, // $4 (已加密)
-    is_verified, // $5
-    created_at, // $6
+    username, // $1
+    email, // $2
+    password, // $3 (已加密)
+    is_verified, // $4
+    created_at, // $5
   ]);
 
   // exec_sql + RETURNING * 會回傳一個物件，直接 return

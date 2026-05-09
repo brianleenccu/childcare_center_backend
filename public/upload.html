@@ -2,13 +2,19 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>圖片上傳與查看系統</title>
+    <title>圖片上傳與修改系統</title>
     <style>
       body {
         font-family: sans-serif;
-        max-width: 800px;
-        margin: 0 auto;
+        max-width: 600px;
+        margin: 20px auto;
+      }
+      .section-box {
+        border: 2px solid #ccc;
         padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
       }
       .form-group {
         margin-bottom: 15px;
@@ -22,79 +28,100 @@
         padding: 5px;
         width: 250px;
       }
-      hr {
-        margin: 40px 0;
-        border: 0;
-        border-top: 1px solid #ccc;
+      button {
+        padding: 8px 15px;
+        font-weight: bold;
+        cursor: pointer;
       }
-
-      /* 照片牆樣式 */
-      .gallery {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
-      }
-      .photo-item {
-        border: 1px solid #ddd;
-        padding: 10px;
-        border-radius: 8px;
-        text-align: center;
-      }
-      .photo-item img {
-        width: 100%;
-        height: 150px;
-        object-fit: cover;
+      .update-btn {
+        background-color: #ff9800;
+        color: white;
+        border: none;
         border-radius: 4px;
       }
-      .photo-item p {
-        margin: 10px 0 5px;
-        font-weight: bold;
-      }
-      .photo-item small {
-        color: #666;
-        font-size: 0.8em;
+      .upload-btn {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
       }
     </style>
   </head>
   <body>
-    <h1>1. 設施照片上傳 (Admin)</h1>
+    <div class="section-box">
+      <h2>1. 設施照片上傳</h2>
+      <div class="form-group">
+        <label>中心編號:</label>
+        <input type="number" id="center_id" placeholder="例如: 1" />
+      </div>
+      <div class="form-group">
+        <label>照片說明:</label>
+        <input type="text" id="caption" placeholder="請輸入說明 (如: 遊戲區)" />
+      </div>
+      <div class="form-group">
+        <label>上傳時間:</label>
+        <input type="datetime-local" id="uploaded_at" />
+      </div>
+      <div class="form-group">
+        <label>選擇圖片:</label>
+        <input type="file" id="photo" />
+      </div>
+      <button class="upload-btn" onclick="uploadPhoto()">上傳照片</button>
+      <img id="preview" width="300" style="display: block; margin-top: 10px" />
+    </div>
 
-    <div class="form-group">
-      <label>中心編號:</label>
-      <input type="number" id="center_id" placeholder="例如: 1" />
+    <div class="section-box">
+      <h2>2. 修改照片說明 (Update)</h2>
+      <div class="form-group">
+        <label>中心編號:</label>
+        <input type="number" id="update_center_id" placeholder="如: 3" />
+      </div>
+      <div class="form-group">
+        <label>照片 ID:</label>
+        <input type="number" id="update_photo_id" placeholder="如: 2" />
+      </div>
+      <div class="form-group">
+        <label>新說明文字:</label>
+        <input
+          type="text"
+          id="update_caption"
+          placeholder="請輸入新的說明文字"
+        />
+      </div>
+      <button class="update-btn" onclick="updatePhotoCaption()">
+        修改說明
+      </button>
     </div>
-    <div class="form-group">
-      <label>照片說明:</label>
-      <input type="text" id="caption" placeholder="請輸入說明 (如: 遊戲區)" />
-    </div>
-    <div class="form-group">
-      <label>上傳時間:</label>
-      <input type="datetime-local" id="uploaded_at" />
-    </div>
-    <div class="form-group">
-      <label>選擇圖片:</label>
-      <input type="file" id="photo" />
+    <div class="section-box" style="border-color: #f44336">
+      <h2>3. 刪除照片 (Delete)</h2>
+      <div class="form-group">
+        <label>中心編號:</label>
+        <input type="number" id="delete_center_id" placeholder="如: 3" />
+      </div>
+      <div class="form-group">
+        <label>照片 ID:</label>
+        <input type="number" id="delete_photo_id" placeholder="如: 2" />
+      </div>
+      <button
+        class="update-btn"
+        style="background-color: #f44336"
+        onclick="deletePhotoRecord()"
+      >
+        刪除照片
+      </button>
     </div>
 
-    <button onclick="uploadPhoto()">上傳照片</button>
-
+    <h3>API 執行結果：</h3>
     <pre
       id="result"
-      style="background: #eee; padding: 10px; margin-top: 10px"
+      style="
+        background: #222;
+        color: #0f0;
+        padding: 15px;
+        border-radius: 5px;
+        overflow-x: auto;
+      "
     ></pre>
-    <img id="preview" width="300" />
-
-    <hr />
-
-    <h1>2. 設施照片牆 (Visitor / Parent)</h1>
-    <div class="form-group">
-      <label>查詢中心 ID:</label>
-      <input type="number" id="view_center_id" placeholder="輸入中心 ID" />
-      <button onclick="getPhotos()">查詢照片牆</button>
-    </div>
-
-    <div id="photo-gallery" class="gallery"></div>
 
     <script>
       // --- 原有的上傳功能 ---
@@ -120,68 +147,76 @@
             : new Date().toISOString()
         );
 
-        const response = await fetch("/api/photo/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        const result = await response.json();
-        document.getElementById("result").innerText = JSON.stringify(
-          result,
-          null,
-          2
-        );
-        if (result.imageUrl)
-          document.getElementById("preview").src = result.imageUrl;
+        try {
+          const response = await fetch("/api/photo/upload", {
+            method: "POST",
+            body: formData,
+          });
+          const result = await response.json();
+          document.getElementById("result").innerText =
+            "【上傳結果】\n" + JSON.stringify(result, null, 2);
+          if (result.imageUrl)
+            document.getElementById("preview").src = result.imageUrl;
+        } catch (err) {
+          document.getElementById("result").innerText = "發生錯誤: " + err;
+        }
       }
 
-      // --- 新增的 View 功能 ---
-      async function getPhotos() {
-        const centerId = document.getElementById("view_center_id").value;
-        const gallery = document.getElementById("photo-gallery");
+      // --- 新增的修改功能 (PATCH) ---
+      async function updatePhotoCaption() {
+        const centerId = document.getElementById("update_center_id").value;
+        const photoId = document.getElementById("update_photo_id").value;
+        const newCaption = document.getElementById("update_caption").value;
 
-        if (!centerId) {
-          alert("請輸入中心 ID 進行查詢");
+        if (!centerId || !photoId || !newCaption) {
+          alert("請填寫所有欄位！");
           return;
         }
 
         try {
-          // 清空之前的結果
-          gallery.innerHTML = "讀取中...";
-
-          // 呼叫你剛寫好的 GET API
-          const response = await fetch(`/api/photo/center/${centerId}`);
-          const result = await response.json();
-
-          if (result.success) {
-            gallery.innerHTML = ""; // 清空文字
-
-            if (result.data.length === 0) {
-              gallery.innerHTML = "<p>此中心目前沒有照片</p>";
-              return;
+          // 網址現在需要同時帶入 centerId 和 photoId
+          const response = await fetch(
+            `/api/photo/${centerId}/${photoId}/caption`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ caption: newCaption }),
             }
+          );
 
-            // 迴圈產生成員
-            result.data.forEach((photo) => {
-              const item = document.createElement("div");
-              item.className = "photo-item";
-
-              // 格式化日期 (取出前10位就好)
-              const dateStr = new Date(photo.uploaded_at).toLocaleDateString();
-
-              item.innerHTML = `
-                <img src="${photo.url}" alt="${photo.caption}">
-                <p>${photo.caption || "無描述"}</p>
-                <small>上傳日期: ${dateStr}</small>
-              `;
-              gallery.appendChild(item);
-            });
-          } else {
-            gallery.innerHTML = "查詢失敗: " + result.error;
-          }
+          const result = await response.json();
+          document.getElementById("result").innerText =
+            "【修改結果】\n" + JSON.stringify(result, null, 2);
         } catch (err) {
-          console.error(err);
-          gallery.innerHTML = "發生錯誤，請查看控制台";
+          document.getElementById("result").innerText = "發生錯誤: " + err;
+        }
+      }
+      // --- 新增的刪除功能 (DELETE) ---
+      async function deletePhotoRecord() {
+        const centerId = document.getElementById("delete_center_id").value;
+        const photoId = document.getElementById("delete_photo_id").value;
+
+        if (!centerId || !photoId) {
+          alert("請填寫中心編號與照片 ID！");
+          return;
+        }
+
+        // 加上確認視窗，防止誤刪
+        if (!confirm(`確定要刪除 中心 ${centerId} 的 第 ${photoId} 張照片嗎？`))
+          return;
+
+        try {
+          const response = await fetch(`/api/photo/${centerId}/${photoId}`, {
+            method: "DELETE",
+          });
+
+          const result = await response.json();
+          document.getElementById("result").innerText =
+            "【刪除結果】\n" + JSON.stringify(result, null, 2);
+        } catch (err) {
+          document.getElementById("result").innerText = "發生錯誤: " + err;
         }
       }
     </script>

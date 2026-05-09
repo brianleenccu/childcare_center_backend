@@ -44,8 +44,27 @@ const getPhotosByCenter = async (center_id) => {
   const result = await executeSql(sql, [center_id]);
   return result;
 };
-
+const updatePhotoCaption = async (center_id, photo_id, caption) => {
+  const sql = `
+    UPDATE facility_photo 
+    SET caption = $1::text 
+    WHERE center_id = $2::int8 AND photo_id = $3::int8 
+    RETURNING row_to_json(facility_photo);
+  `;
+  // $1 是新的說明文字, $2 是中心的 ID, $3 是照片的 ID
+  return await executeSql(sql, [caption, center_id, photo_id]);
+};
+const deletePhotoRecord = async (center_id, photo_id) => {
+  const sql = `
+    DELETE FROM facility_photo 
+    WHERE center_id = $1::int8 AND photo_id = $2::int8 
+    RETURNING row_to_json(facility_photo);
+  `;
+  return await executeSql(sql, [center_id, photo_id]);
+};
 module.exports = {
   createPhotoRecord,
   getPhotosByCenter,
+  updatePhotoCaption,
+  deletePhotoRecord,
 };

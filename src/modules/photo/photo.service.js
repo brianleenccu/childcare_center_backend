@@ -8,4 +8,15 @@ const getCenterPhotos = async (center_id) => {
   return await model.getPhotosByCenter(center_id);
 };
 
-module.exports = { addPhotoRecord, getCenterPhotos };
+const updateCaption = async (center_id, photo_id, caption) => {
+  return await model.updatePhotoCaption(center_id, photo_id, caption);
+};
+const deletePhoto = async (center_id, photo_id) => {
+  return await model.deletePhotoRecord(center_id, photo_id);
+};
+module.exports = {
+  addPhotoRecord,
+  getCenterPhotos,
+  updateCaption,
+  deletePhoto,
+};
