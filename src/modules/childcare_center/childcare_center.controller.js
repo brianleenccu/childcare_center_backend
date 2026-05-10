@@ -85,4 +85,25 @@ const searchByCategory = async (req, res) => {
   }
 };
 
-module.exports = { getAll, getById, create, update, remove, searchByCapacity, searchByOperationType, searchByDistrict, searchByCategory };
+const searchByTimeRange = async (req, res) => {
+  try {
+    const { open_time, close_time } = req.query;
+    if (!open_time || !close_time) return res.status(400).json({ error: 'open_time and close_time are required' });
+    const data = await service.searchByTimeRange(open_time, close_time);
+    res.json(data);
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message });
+  }
+};
+
+const searchByTeacherStudentRatio = async (req, res) => {
+  try {
+    if (!req.query.ratio) return res.status(400).json({ error: 'ratio is required' });
+    const data = await service.searchByTeacherStudentRatio(req.query.ratio);
+    res.json(data);
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message });
+  }
+};
+
+module.exports = { getAll, getById, create, update, remove, searchByCapacity, searchByOperationType, searchByDistrict, searchByCategory, searchByTimeRange, searchByTeacherStudentRatio };

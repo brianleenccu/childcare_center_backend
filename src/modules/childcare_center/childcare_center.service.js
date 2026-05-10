@@ -28,4 +28,8 @@ const searchByDistrict = (district) => model.findByDistrict(district);
 
 const searchByCategory = (category) => model.findByCategory(category);
 
-module.exports = { getAll, getById, createCenter, updateCenter, deleteCenter, searchByCapacity, searchByOperationType, searchByDistrict, searchByCategory };
+const searchByTimeRange = (openTime, closeTime) => model.findByTimeRange(openTime, closeTime);
+
+const searchByTeacherStudentRatio = (ratio) => model.findByTeacherStudentRatio(ratio);
+
+module.exports = { getAll, getById, createCenter, updateCenter, deleteCenter, searchByCapacity, searchByOperationType, searchByDistrict, searchByCategory, searchByTimeRange, searchByTeacherStudentRatio };

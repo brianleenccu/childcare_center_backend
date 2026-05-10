@@ -111,4 +111,49 @@ const findByDistrict = async (district) => {
   return result.rows;
 };
 
-module.exports = { findAll, findById, create, update, remove, findByCapacityRange, findByOperationType, findByCategory, findByDistrict };
+const RATIO_MAP = {
+  '1:1': 1.0,
+  '1:2': 0.5,
+  '1:3': 1.0 / 3,
+  '1:4': 0.25,
+  '1:5': 0.2,
+};
+
+const findByTeacherStudentRatio = async (ratio) => {
+  const value = RATIO_MAP[ratio];
+  if (value === undefined) {
+    throw Object.assign(
+      new Error(`Invalid ratio. Valid values: ${Object.keys(RATIO_MAP).join(', ')}`),
+      { status: 400 }
+    );
+  }
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} WHERE teacher_student_ratio >= $1 - 0.001 ORDER BY center_id`,
+    [value]
+  );
+  return result.rows;
+};
+
+const TIME_RE = /^([01]\d|2[0-2]):([0-5]\d)$/;
+
+const validateTime = (time) => {
+  if (!TIME_RE.test(time)) {
+    throw Object.assign(new Error('Invalid time format. Use HH:MM (e.g. 07:30)'), { status: 400 });
+  }
+  const [h, m] = time.split(':').map(Number);
+  if (h < 6 || (h === 22 && m > 0)) {
+    throw Object.assign(new Error('Time must be between 06:00 and 22:00'), { status: 400 });
+  }
+};
+
+const findByTimeRange = async (openTime, closeTime) => {
+  validateTime(openTime);
+  validateTime(closeTime);
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} WHERE open_time >= $1 AND close_time <= $2 ORDER BY center_id`,
+    [`${openTime}:00`, `${closeTime}:00`]
+  );
+  return result.rows;
+};
+
+module.exports = { findAll, findById, create, update, remove, findByCapacityRange, findByOperationType, findByCategory, findByDistrict, findByTimeRange, findByTeacherStudentRatio };

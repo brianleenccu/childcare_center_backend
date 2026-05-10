@@ -244,6 +244,71 @@ router.get('/search/district', ctrl.searchByDistrict);
 
 /**
  * @swagger
+ * /api/childcare-centers/search/ratio:
+ *   get:
+ *     summary: Filter childcare centers by teacher-student ratio
+ *     tags: [ChildcareCenter]
+ *     description: Returns centers whose teacher_student_ratio >= the selected ratio value. Selecting 1:4 includes centers with 1:1, 1:2, 1:3, and 1:4.
+ *     parameters:
+ *       - in: query
+ *         name: ratio
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ["1:1", "1:2", "1:3", "1:4", "1:5"]
+ *         description: Minimum teacher-student ratio
+ *     responses:
+ *       200:
+ *         description: List of matching childcare centers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ChildcareCenter'
+ *       400:
+ *         description: Invalid or missing ratio value
+ */
+router.get('/search/ratio', ctrl.searchByTeacherStudentRatio);
+
+/**
+ * @swagger
+ * /api/childcare-centers/search/time:
+ *   get:
+ *     summary: Filter childcare centers by available time range
+ *     tags: [ChildcareCenter]
+ *     description: Returns centers whose open_time >= open_time param AND close_time <= close_time param
+ *     parameters:
+ *       - in: query
+ *         name: open_time
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "07:30"
+ *         description: "Earliest acceptable open time in HH:MM format (06:00–22:00)"
+ *       - in: query
+ *         name: close_time
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "18:30"
+ *         description: "Latest acceptable close time in HH:MM format (06:00–22:00)"
+ *     responses:
+ *       200:
+ *         description: List of matching childcare centers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ChildcareCenter'
+ *       400:
+ *         description: open_time or close_time missing or invalid
+ */
+router.get('/search/time', ctrl.searchByTimeRange);
+
+/**
+ * @swagger
  * /api/childcare-centers/{id}:
  *   get:
  *     summary: Get a childcare center by ID
