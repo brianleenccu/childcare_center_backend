@@ -5,4 +5,8 @@ const createAdminAccount = async (payload) => {
   return await model.createAdminRecord(payload);
 };
 
-module.exports = { createAdminAccount };
+const getAdminByEmail = async (email) => {
+  return await model.getAdminByEmail(email);
+};
+
+module.exports = { createAdminAccount, getAdminByEmail };
