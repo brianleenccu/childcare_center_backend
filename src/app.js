@@ -5,6 +5,8 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./core/config/swagger");
 const photoRoutes = require("./modules/photo/photo.routes");
 const adminRoutes = require("./modules/adminLogin/admin.routes");
+const parentRoutes = require("./modules/parentLogin/parent.routes");
+
 const app = express();
 app.use(express.json());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -12,6 +14,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 //app.use(express.static("public"));
 app.use("/api/photo", photoRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/parent", parentRoutes);
+
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

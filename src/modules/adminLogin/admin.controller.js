@@ -41,7 +41,10 @@ const loginAdmin = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ error: "請輸入信箱與密碼" });
     }
-
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Email 格式不正確" });
+    }
     // 2. 去資料庫找這個信箱
     const admin = await service.getAdminByEmail(email);
 
@@ -86,8 +89,4 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-if (!emailRegex.test(email)) {
-  return res.status(400).json({ error: "Email 格式不正確" });
-}
 module.exports = { registerAdmin, loginAdmin };
