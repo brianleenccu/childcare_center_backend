@@ -309,6 +309,70 @@ router.get('/search/time', ctrl.searchByTimeRange);
 
 /**
  * @swagger
+ * /api/childcare-centers/search:
+ *   get:
+ *     summary: Filter childcare centers by multiple criteria
+ *     tags: [ChildcareCenter]
+ *     description: All parameters are optional. When multiple parameters are provided, results must match all conditions (AND logic).
+ *     parameters:
+ *       - in: query
+ *         name: range
+ *         schema:
+ *           type: string
+ *           enum: [1-15, 16-30, 31-45, 46-60]
+ *         description: Total capacity range
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *           enum: [公立, 私立]
+ *         description: Operation type
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *           enum: [托嬰中心, 幼兒園, 托兒所]
+ *         description: Category
+ *       - in: query
+ *         name: district
+ *         schema:
+ *           type: string
+ *           enum: [中正區, 萬華區, 大同區, 中山區, 松山區, 大安區, 信義區, 內湖區, 南港區, 士林區, 北投區, 文山區]
+ *         description: Taipei district
+ *       - in: query
+ *         name: ratio
+ *         schema:
+ *           type: string
+ *           enum: ["1:1", "1:2", "1:3", "1:4", "1:5"]
+ *         description: Minimum teacher-student ratio
+ *       - in: query
+ *         name: open_time
+ *         schema:
+ *           type: string
+ *           example: "07:30"
+ *         description: "Earliest acceptable open time in HH:MM format (06:00–22:00)"
+ *       - in: query
+ *         name: close_time
+ *         schema:
+ *           type: string
+ *           example: "18:30"
+ *         description: "Latest acceptable close time in HH:MM format (06:00–22:00)"
+ *     responses:
+ *       200:
+ *         description: List of matching childcare centers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ChildcareCenter'
+ *       400:
+ *         description: Invalid parameter value
+ */
+router.get('/search', ctrl.searchByFilters);
+
+/**
+ * @swagger
  * /api/childcare-centers/{id}:
  *   get:
  *     summary: Get a childcare center by ID
