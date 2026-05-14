@@ -106,4 +106,14 @@ const searchByTeacherStudentRatio = async (req, res) => {
   }
 };
 
-module.exports = { getAll, getById, create, update, remove, searchByCapacity, searchByOperationType, searchByDistrict, searchByCategory, searchByTimeRange, searchByTeacherStudentRatio };
+const searchByFilters = async (req, res) => {
+  try {
+    const { range, type, category, district, ratio, open_time, close_time } = req.query;
+    const data = await service.searchByFilters({ range, type, category, district, ratio, open_time, close_time });
+    res.json(data);
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message });
+  }
+};
+
+module.exports = { getAll, getById, create, update, remove, searchByCapacity, searchByOperationType, searchByDistrict, searchByCategory, searchByTimeRange, searchByTeacherStudentRatio, searchByFilters };

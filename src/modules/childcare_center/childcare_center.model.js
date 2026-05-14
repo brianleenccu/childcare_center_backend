@@ -112,11 +112,11 @@ const findByDistrict = async (district) => {
 };
 
 const RATIO_MAP = {
-  '1:1': 1.0,
-  '1:2': 0.5,
-  '1:3': 1.0 / 3,
-  '1:4': 0.25,
-  '1:5': 0.2,
+  '1:1': 1.00000,
+  '1:2': 0.50000,
+  '1:3': 0.33333,
+  '1:4': 0.25000,
+  '1:5': 0.20000,
 };
 
 const findByTeacherStudentRatio = async (ratio) => {
@@ -128,7 +128,7 @@ const findByTeacherStudentRatio = async (ratio) => {
     );
   }
   const result = await pool.query(
-    `SELECT * FROM ${TABLE} WHERE teacher_student_ratio >= $1 - 0.001 ORDER BY center_id`,
+    `SELECT * FROM ${TABLE} WHERE teacher_student_ratio >= $1 ORDER BY center_id`,
     [value]
   );
   return result.rows;
@@ -156,4 +156,67 @@ const findByTimeRange = async (openTime, closeTime) => {
   return result.rows;
 };
 
-module.exports = { findAll, findById, create, update, remove, findByCapacityRange, findByOperationType, findByCategory, findByDistrict, findByTimeRange, findByTeacherStudentRatio };
+const findByFilters = async ({ range, type, category, district, ratio, open_time, close_time }) => {
+  const conditions = [];
+  const values = [];
+  let idx = 1;
+
+  if (range !== undefined) {
+    const bounds = CAPACITY_RANGES[range];
+    if (!bounds) throw Object.assign(new Error(`Invalid range. Valid values: ${Object.keys(CAPACITY_RANGES).join(', ')}`), { status: 400 });
+    conditions.push(`total_capacity BETWEEN $${idx} AND $${idx + 1}`);
+    values.push(bounds.min, bounds.max);
+    idx += 2;
+  }
+
+  if (type !== undefined) {
+    conditions.push(`operation_type = $${idx}`);
+    values.push(type);
+    idx += 1;
+  }
+
+  if (category !== undefined) {
+    if (!CATEGORIES.has(category)) throw Object.assign(new Error(`Invalid category. Valid values: ${[...CATEGORIES].join(', ')}`), { status: 400 });
+    conditions.push(`category = $${idx}`);
+    values.push(category);
+    idx += 1;
+  }
+
+  if (district !== undefined) {
+    if (!TAIPEI_DISTRICTS.has(district)) throw Object.assign(new Error(`Invalid district. Valid values: ${[...TAIPEI_DISTRICTS].join(', ')}`), { status: 400 });
+    conditions.push(`district = $${idx}`);
+    values.push(district);
+    idx += 1;
+  }
+
+  if (ratio !== undefined) {
+    const value = RATIO_MAP[ratio];
+    if (value === undefined) throw Object.assign(new Error(`Invalid ratio. Valid values: ${Object.keys(RATIO_MAP).join(', ')}`), { status: 400 });
+    conditions.push(`teacher_student_ratio >= $${idx}`);
+    values.push(value);
+    idx += 1;
+  }
+
+  if (open_time !== undefined) {
+    validateTime(open_time);
+    conditions.push(`open_time >= $${idx}`);
+    values.push(`${open_time}:00`);
+    idx += 1;
+  }
+
+  if (close_time !== undefined) {
+    validateTime(close_time);
+    conditions.push(`close_time <= $${idx}`);
+    values.push(`${close_time}:00`);
+    idx += 1;
+  }
+
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} ${where} ORDER BY center_id`,
+    values
+  );
+  return result.rows;
+};
+
+module.exports = { findAll, findById, create, update, remove, findByCapacityRange, findByOperationType, findByCategory, findByDistrict, findByTimeRange, findByTeacherStudentRatio, findByFilters };

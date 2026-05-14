@@ -32,4 +32,6 @@ const searchByTimeRange = (openTime, closeTime) => model.findByTimeRange(openTim
 
 const searchByTeacherStudentRatio = (ratio) => model.findByTeacherStudentRatio(ratio);
 
-module.exports = { getAll, getById, createCenter, updateCenter, deleteCenter, searchByCapacity, searchByOperationType, searchByDistrict, searchByCategory, searchByTimeRange, searchByTeacherStudentRatio };
+const searchByFilters = (filters) => model.findByFilters(filters);
+
+module.exports = { getAll, getById, createCenter, updateCenter, deleteCenter, searchByCapacity, searchByOperationType, searchByDistrict, searchByCategory, searchByTimeRange, searchByTeacherStudentRatio, searchByFilters };
