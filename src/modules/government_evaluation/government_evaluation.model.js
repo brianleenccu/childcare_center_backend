@@ -1,23 +1,21 @@
 const { createClient } = require("@supabase/supabase-js");
 
-const SUPABASE_URL = "https://rfzavcliggzlpkqqcrzr.supabase.co";
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-const SUPABASE_KEY = "sb_publishable_48pF8e_sZQP5MQXKkeeTOQ_pfESdvZV";
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error("Missing Supabase URL or anon key in environment variables.");
+}
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.getAllGovernmentEvaluations = async () => {
   const { data, error } = await supabase
     .from("evaluation_record")
     .select("*")
-    .order("evaluation_id", {
-      ascending: true,
-    });
+    .order("evaluation_id", { ascending: true });
 
-  if (error) {
-    throw error;
-  }
-
+  if (error) throw error;
   return data;
 };
 
@@ -28,23 +26,28 @@ exports.getGovernmentEvaluationById = async (id) => {
     .eq("evaluation_id", id)
     .single();
 
-  if (error) {
-    throw error;
-  }
-
+  if (error) throw error;
   return data;
 };
 
-exports.createGovernmentEvaluation = async (governmentEvaluation) => {
+exports.getGovernmentEvaluationsByCenterId = async (centerId) => {
   const { data, error } = await supabase
     .from("evaluation_record")
-    .insert([governmentEvaluation])
+    .select("*")
+    .eq("center_id", centerId)
+    .order("completion_date", { ascending: false });
+
+  if (error) throw error;
+  return data;
+};
+
+exports.createGovernmentEvaluation = async (record) => {
+  const { data, error } = await supabase
+    .from("evaluation_record")
+    .insert([record])
     .select();
 
-  if (error) {
-    throw error;
-  }
-
+  if (error) throw error;
   return data;
 };
 
@@ -55,10 +58,7 @@ exports.updateGovernmentEvaluation = async (id, updates) => {
     .eq("evaluation_id", id)
     .select();
 
-  if (error) {
-    throw error;
-  }
-
+  if (error) throw error;
   return data;
 };
 
@@ -68,9 +68,7 @@ exports.deleteGovernmentEvaluation = async (id) => {
     .delete()
     .eq("evaluation_id", id);
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
   return {
     message: "Government evaluation deleted successfully",
