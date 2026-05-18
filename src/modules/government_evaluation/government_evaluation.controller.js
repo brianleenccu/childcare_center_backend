@@ -4,29 +4,34 @@ exports.getAllGovernmentEvaluations = async (req, res) => {
   try {
     const data =
       await governmentEvaluationService.getAllGovernmentEvaluations();
-
     res.status(200).json(data);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Failed to fetch government evaluations",
-    });
+    res.status(500).json({ error: error.message });
   }
 };
 
 exports.getGovernmentEvaluationById = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const data =
-      await governmentEvaluationService.getGovernmentEvaluationById(id);
+    const data = await governmentEvaluationService.getGovernmentEvaluationById(
+      req.params.id,
+    );
 
     res.status(200).json(data);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Failed to fetch government evaluation",
-    });
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getGovernmentEvaluationsByCenterId = async (req, res) => {
+  try {
+    const data =
+      await governmentEvaluationService.getGovernmentEvaluationsByCenterId(
+        req.params.centerId,
+      );
+
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -38,44 +43,31 @@ exports.createGovernmentEvaluation = async (req, res) => {
 
     res.status(201).json(data);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Failed to create government evaluation",
-    });
+    res.status(500).json({ error: error.message });
   }
 };
 
 exports.updateGovernmentEvaluation = async (req, res) => {
   try {
-    const { id } = req.params;
-
     const data = await governmentEvaluationService.updateGovernmentEvaluation(
-      id,
+      req.params.id,
       req.body,
     );
 
     res.status(200).json(data);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Failed to update government evaluation",
-    });
+    res.status(500).json({ error: error.message });
   }
 };
 
 exports.deleteGovernmentEvaluation = async (req, res) => {
   try {
-    const { id } = req.params;
+    const data = await governmentEvaluationService.deleteGovernmentEvaluation(
+      req.params.id,
+    );
 
-    await governmentEvaluationService.deleteGovernmentEvaluation(id);
-
-    res.status(200).json({
-      message: "Government evaluation deleted successfully",
-    });
+    res.status(200).json(data);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Failed to delete government evaluation",
-    });
+    res.status(500).json({ error: error.message });
   }
 };

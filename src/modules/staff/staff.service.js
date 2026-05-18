@@ -1,72 +1,25 @@
-const { createClient } = require("@supabase/supabase-js");
-
-const SUPABASE_URL = "https://rfzavcliggzlpkqqcrzr.supabase.co";
-
-const SUPABASE_KEY = "sb_publishable_48pF8e_sZQP5MQXKkeeTOQ_pfESdvZV";
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const staffModel = require("./staff.model");
 
 exports.getAllStaff = async () => {
-  const { data, error } = await supabase
-    .from("staff")
-    .select("*")
-    .order("staff_id", {
-      ascending: true,
-    });
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
+  return await staffModel.getAllStaff();
 };
 
 exports.getStaffById = async (id) => {
-  const { data, error } = await supabase
-    .from("staff")
-    .select("*")
-    .eq("staff_id", id)
-    .single();
+  return await staffModel.getStaffById(id);
+};
 
-  if (error) {
-    throw error;
-  }
-
-  return data;
+exports.getStaffByCenterId = async (centerId) => {
+  return await staffModel.getStaffByCenterId(centerId);
 };
 
 exports.createStaff = async (staff) => {
-  const { data, error } = await supabase.from("staff").insert([staff]).select();
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
+  return await staffModel.createStaff(staff);
 };
 
 exports.updateStaff = async (id, updates) => {
-  const { data, error } = await supabase
-    .from("staff")
-    .update(updates)
-    .eq("staff_id", id)
-    .select();
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
+  return await staffModel.updateStaff(id, updates);
 };
 
 exports.deleteStaff = async (id) => {
-  const { error } = await supabase.from("staff").delete().eq("staff_id", id);
-
-  if (error) {
-    throw error;
-  }
-
-  return {
-    message: "Staff deleted successfully",
-  };
+  return await staffModel.deleteStaff(id);
 };

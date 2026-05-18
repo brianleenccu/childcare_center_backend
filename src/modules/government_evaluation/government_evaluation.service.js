@@ -8,6 +8,12 @@ exports.getGovernmentEvaluationById = async (id) => {
   return await governmentEvaluationModel.getGovernmentEvaluationById(id);
 };
 
+exports.getGovernmentEvaluationsByCenterId = async (centerId) => {
+  return await governmentEvaluationModel.getGovernmentEvaluationsByCenterId(
+    centerId,
+  );
+};
+
 exports.createGovernmentEvaluation = async (data) => {
   return await governmentEvaluationModel.createGovernmentEvaluation(data);
 };
