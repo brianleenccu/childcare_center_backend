@@ -7,6 +7,7 @@ const photoRoutes = require("./modules/photo/photo.routes");
 const adminRoutes = require("./modules/adminLogin/admin.routes");
 const parentRoutes = require("./modules/parentLogin/parent.routes");
 const childcareCenterRoutes = require("./modules/childcare_center/childcare_center.routes");
+const reviewRoutes = require("./modules/reviews/reviews.routes");
 
 const app = express();
 app.use(express.json());
@@ -25,6 +26,7 @@ app.use("/api/photo", photoRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/parent", parentRoutes);
 app.use("/api/childcare-centers", childcareCenterRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

@@ -72,3 +72,30 @@ Base URL：`/api/childcare-centers`
 | GET | `/search/district?district=` | 依台北市行政區篩選（12 行政區） |
 | GET | `/search/ratio?ratio=` | 依師生比篩選（`1:1` ～ `1:5`，回傳比例 ≥ 選擇值的中心） |
 | GET | `/search/time?open_time=&close_time=` | 依營業時段篩選，格式 `HH:MM`，範圍 `06:00`～`22:00` |
+
+## Reviews API
+
+Base URL：`/api/reviews`
+
+| Method | 路徑 | 說明 |
+|--------|------|------|
+| POST | `/` | 新增評論 |
+| GET | `/:id` | 查詢單筆評論 |
+| PUT | `/:id` | 更新評論 |
+| DELETE | `/:id` | 刪除評論 |
+
+### 欄位說明
+
+| 欄位 | 類型 | 說明 |
+|------|------|------|
+| `review_id` | integer | 主鍵，自動產生 |
+| `parent_id` | integer | 家長 ID |
+| `center_id` | integer | 托育中心 ID |
+| `score_overall` | float | 自動計算（staff + enviroment + curriculum 平均，取小數點後一位） |
+| `score_staff` | integer | 師資評分 |
+| `score_enviroment` | integer | 環境評分 |
+| `score_curriculum` | integer | 課程評分 |
+| `comment` | string | 文字評論 |
+| `created_at` | timestamp | 建立時間，由前端傳入 |
+
+> `score_overall` 不可由使用者自行傳入，系統會在新增或更新時自動計算。
