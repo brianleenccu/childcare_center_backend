@@ -9,6 +9,7 @@ const adminRoutes = require("./modules/adminLogin/admin.routes");
 const parentRoutes = require("./modules/parentLogin/parent.routes");
 const childcareCenterRoutes = require("./modules/childcare_center/childcare_center.routes");
 const reviewRoutes = require("./modules/reviews/reviews.routes");
+const favoriteRoutes = require("./modules/favorite/favorite.routes");
 
 const staffRoutes = require("./modules/staff/staff.routes");
 const governmentEvaluationRoutes = require("./modules/government_evaluation/government_evaluation.routes");
@@ -38,6 +39,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/parent", parentRoutes);
 app.use("/api/childcare-centers", childcareCenterRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/favorites", favoriteRoutes);
 
 // New CRUD routes
 app.use("/api/staff", staffRoutes);
