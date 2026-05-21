@@ -6,14 +6,14 @@ const getById = async (id) => {
   return review;
 };
 
-const SCORE_FIELDS = ['score_staff', 'score_enviroment', 'score_curriculum'];
+const SCORE_FIELDS = ['score_staff', 'score_environment', 'score_curriculum'];
 
 const createReview = async (payload) => {
   const { score_overall, review_id, ...safePayload } = payload;
 
-  const { score_staff, score_enviroment, score_curriculum } = safePayload;
-  if (score_staff != null && score_enviroment != null && score_curriculum != null) {
-    safePayload.score_overall = Math.round((score_staff + score_enviroment + score_curriculum) / 3 * 10) / 10;
+  const { score_staff, score_environment, score_curriculum } = safePayload;
+  if (score_staff != null && score_environment != null && score_curriculum != null) {
+    safePayload.score_overall = Math.round((score_staff + score_environment + score_curriculum) / 3 * 10) / 10;
   }
 
   return model.create(safePayload);
@@ -27,7 +27,7 @@ const updateReview = async (id, payload) => {
   const hasScoreUpdate = SCORE_FIELDS.some((f) => f in safePayload);
   if (hasScoreUpdate) {
     const staff      = safePayload.score_staff      ?? current.score_staff;
-    const env        = safePayload.score_enviroment ?? current.score_enviroment;
+    const env        = safePayload.score_environment ?? current.score_environment;
     const curriculum = safePayload.score_curriculum ?? current.score_curriculum;
 
     if (staff != null && env != null && curriculum != null) {

@@ -23,7 +23,7 @@ const router = Router();
  *         score_staff:
  *           type: integer
  *           nullable: true
- *         score_enviroment:
+ *         score_environment:
  *           type: integer
  *           nullable: true
  *         score_curriculum:
@@ -60,7 +60,7 @@ const router = Router();
  *                 type: integer
  *               score_staff:
  *                 type: integer
- *               score_enviroment:
+ *               score_environment:
  *                 type: integer
  *               score_curriculum:
  *                 type: integer
@@ -117,7 +117,7 @@ router.post('/', ctrl.create);
  *             properties:
  *               score_staff:
  *                 type: integer
- *               score_enviroment:
+ *               score_environment:
  *                 type: integer
  *               score_curriculum:
  *                 type: integer

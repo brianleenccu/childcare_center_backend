@@ -91,9 +91,9 @@ Base URL：`/api/reviews`
 | `review_id` | integer | 主鍵，自動產生 |
 | `parent_id` | integer | 家長 ID |
 | `center_id` | integer | 托育中心 ID |
-| `score_overall` | float | 自動計算（staff + enviroment + curriculum 平均，取小數點後一位） |
+| `score_overall` | float | 自動計算（staff + environment + curriculum 平均，取小數點後一位） |
 | `score_staff` | integer | 師資評分 |
-| `score_enviroment` | integer | 環境評分 |
+| `score_environment` | integer | 環境評分 |
 | `score_curriculum` | integer | 課程評分 |
 | `comment` | string | 文字評論 |
 | `created_at` | timestamp | 建立時間，由前端傳入 |
