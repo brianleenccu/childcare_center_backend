@@ -71,9 +71,25 @@ const deletePhotoRecord = async (center_id, photo_id) => {
   `;
   return await executeSql(sql, [center_id, photo_id]);
 };
+// 在 photo.model.js 內新增此函數
+const getPhotoCaption = async (center_id, photo_id) => {
+  // 精準查詢該中心、該照片編號的說明文字
+  const sql = `
+    SELECT caption 
+    FROM facility_photo 
+    WHERE center_id = $1::int8 AND photo_id = $2::int8;
+  `;
+
+  const result = await pool.query(sql, [center_id, photo_id]);
+
+  // 如果有找到資料，回傳該筆物件（例如 { caption: '公共區域' }），找不到則回傳 null
+  return result.rows && result.rows.length > 0 ? result.rows[0] : null;
+};
+
 module.exports = {
   createPhotoRecord,
   getPhotosByCenter,
   updatePhotoCaption,
   deletePhotoRecord,
+  getPhotoCaption,
 };

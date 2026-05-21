@@ -239,4 +239,52 @@ router.patch("/:center_id/:photo_id/caption", controller.updateCaption);
  *         description: 伺服器錯誤
  */
 router.delete("/:center_id/:photo_id", controller.deletePhoto);
+/**
+ * @swagger
+ * /api/photo/{center_id}/{photo_id}/caption:
+ *   get:
+ *     summary: 獲取特定照片的描述 (Caption)
+ *     description: 根據 center_id 與 photo_id 精準查詢單張照片的說明文字，用於前端畫面標註
+ *     tags:
+ *       - Photos
+ *     parameters:
+ *       - in: path
+ *         name: center_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: 托育中心 ID
+ *         example: 1
+ *
+ *       - in: path
+ *         name: photo_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: 照片 ID
+ *         example: 2
+ *
+ *     responses:
+ *       200:
+ *         description: 成功獲取描述
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *
+ *                 caption:
+ *                   type: string
+ *                   example: "閱讀區"
+ *
+ *       404:
+ *         description: 找不到該照片描述
+ *
+ *       500:
+ *         description: 伺服器錯誤
+ */
+router.get("/:center_id/:photo_id/caption", controller.getPhotoCaption);
 module.exports = router;

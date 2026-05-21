@@ -152,9 +152,38 @@ const deletePhoto = async (req, res) => {
   }
 };
 
+/// 在 photo.controller.js 內新增此函數
+const getPhotoCaption = async (req, res) => {
+  try {
+    // 從 URL 路由參數中取得 center_id 與 photo_id
+    const { center_id, photo_id } = req.params;
+
+    const record = await service.getPhotoCaption(center_id, photo_id);
+
+    // 🛡️ 遵照你原本代碼的防禦機制，檢查是否為空值
+    if (!record) {
+      return res.status(404).json({
+        success: false,
+        error: `找不到中心 ${center_id} 編號 ${photo_id} 的照片描述`,
+      });
+    }
+
+    res.json({
+      success: true,
+      // 直接把物件裡的 caption 字串送給前端，方便前端直接使用
+      caption: record.caption,
+    });
+  } catch (err) {
+    console.error("❌ 取得特定照片描述失敗:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// 記得在 module.exports 補上匯出
 module.exports = {
   uploadPhoto,
   getCenterPhotos,
   updateCaption,
   deletePhoto,
+  getPhotoCaption, // 新增這行
 };
