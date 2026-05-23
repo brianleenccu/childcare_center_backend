@@ -8,11 +8,20 @@ const getById = async (id) => {
   return center;
 };
 
-const createCenter = (payload) => model.create(payload);
+const createCenter = (payload) => {
+  const { created_at, updated_at, ...rest } = payload;
+  const now = new Date();
+  return model.create({
+    ...rest,
+    created_at: now.toISOString().split('T')[0],
+    updated_at: now,
+  });
+};
 
 const updateCenter = async (id, payload) => {
   await getById(id);                // 等查完，如果找不到會 throw 404
-  return model.update(id, payload);
+  const { updated_at, ...rest } = payload;
+  return model.update(id, { ...rest, updated_at: new Date() });
 };
 
 const deleteCenter = async (id) => {

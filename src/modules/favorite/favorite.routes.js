@@ -18,7 +18,9 @@ const router = Router();
  *           type: integer
  *         added_at:
  *           type: string
- *           format: date-time
+ *           example: "2026-05-22 14:09:21.966028"
+ *           description: "Set automatically by the server (timestamp)"
+ *           readOnly: true
  *           nullable: true
  */
 
@@ -42,9 +44,6 @@ const router = Router();
  *                 type: integer
  *               center_id:
  *                 type: integer
- *               added_at:
- *                 type: string
- *                 format: date-time
  *     responses:
  *       201:
  *         description: Created favorite item

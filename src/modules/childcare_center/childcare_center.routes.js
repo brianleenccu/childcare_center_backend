@@ -55,11 +55,15 @@ const router = Router();
  *           type: integer
  *         updated_at:
  *           type: string
- *           example: "2024-06-01 02:00:00"
- *           description: "timestamp format: YYYY-MM-DD HH:MM:SS"
+ *           example: "2026-05-22 14:09:21.966028"
+ *           description: "Set automatically by the server (timestamp)"
+ *           readOnly: true
  *         created_at:
  *           type: string
  *           format: date
+ *           example: "2024-01-24"
+ *           description: "Set automatically by the server (date)"
+ *           readOnly: true
  *     ChildcareCenterInput:
  *       type: object
  *       properties:
@@ -104,12 +108,6 @@ const router = Router();
  *           example: "18:30:00"
  *         centeraccount_id:
  *           type: integer
- *         updated_at:
- *           type: string
- *           example: "2024-06-01 02:00:00"
- *         created_at:
- *           type: string
- *           format: date
  */
 
 /**

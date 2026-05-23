@@ -34,7 +34,9 @@ const router = Router();
  *           nullable: true
  *         created_at:
  *           type: string
- *           format: date-time
+ *           example: "2026-05-22 14:09:21.966028"
+ *           description: "Set automatically by the server (timestamp)"
+ *           readOnly: true
  *           nullable: true
  */
 
