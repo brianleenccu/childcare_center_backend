@@ -7,7 +7,8 @@ const getById = async (id) => {
 };
 
 const createFavorite = async (payload) => {
-  const { fav_item_id, ...safePayload } = payload;
+  const { fav_item_id, added_at, ...safePayload } = payload;
+  safePayload.added_at = new Date();
   return model.create(safePayload);
 };
 

@@ -9,7 +9,8 @@ const getById = async (id) => {
 const SCORE_FIELDS = ['score_staff', 'score_environment', 'score_curriculum'];
 
 const createReview = async (payload) => {
-  const { score_overall, review_id, ...safePayload } = payload;
+  const { score_overall, review_id, created_at, ...safePayload } = payload;
+  safePayload.created_at = new Date();
 
   const { score_staff, score_environment, score_curriculum } = safePayload;
   if (score_staff != null && score_environment != null && score_curriculum != null) {
