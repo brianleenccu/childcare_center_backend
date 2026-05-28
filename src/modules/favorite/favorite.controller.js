@@ -1,4 +1,4 @@
-const service = require('./favorite.service');
+const service = require("./favorite.service");
 
 const getById = async (req, res) => {
   try {
@@ -14,6 +14,11 @@ const create = async (req, res) => {
     const item = await service.createFavorite(req.body);
     res.status(201).json(item);
   } catch (err) {
+    if (err.code === "23505") {
+      return res
+        .status(409)
+        .json({ error: "重複收藏：這間機構已在您的收藏清單中！" });
+    }
     res.status(err.status || 500).json({ error: err.message });
   }
 };

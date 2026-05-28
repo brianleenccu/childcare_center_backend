@@ -67,5 +67,22 @@ const getParentByEmail = async (email) => {
 
   return data;
 };
+const updateParentProfile = async (parentId, updateData) => {
+  const { name, email, phone } = updateData;
 
-module.exports = { createParentRecord, getParentByEmail };
+  const sql = `
+    UPDATE parent 
+    SET name = $1::text, email = $2::text, phone = $3::text
+    WHERE parent_id = $4::int
+    RETURNING row_to_json(parent);
+  `;
+
+  const result = await executeSql(sql, [name, email, phone, parentId]);
+  return Array.isArray(result) ? result[0] : result;
+};
+
+module.exports = {
+  createParentRecord,
+  getParentByEmail,
+  updateParentProfile,
+};

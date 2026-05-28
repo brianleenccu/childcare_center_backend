@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 const governmentEvaluationController = require("./government_evaluation.controller");
+const {
+  verifyToken,
+  authorizeRole,
+} = require("../../core/config/middleware/auth.middleware");
 
 /**
  * @swagger
@@ -90,7 +94,7 @@ router.get("/", governmentEvaluationController.getAllGovernmentEvaluations);
  */
 router.get(
   "/center/:centerId",
-  governmentEvaluationController.getGovernmentEvaluationsByCenterId,
+  governmentEvaluationController.getGovernmentEvaluationsByCenterId
 );
 
 /**
@@ -138,7 +142,12 @@ router.get("/:id", governmentEvaluationController.getGovernmentEvaluationById);
  *             schema:
  *               $ref: '#/components/schemas/GovernmentEvaluation'
  */
-router.post("/", governmentEvaluationController.createGovernmentEvaluation);
+router.post(
+  "/",
+  verifyToken,
+  authorizeRole("admin"),
+  governmentEvaluationController.createGovernmentEvaluation
+);
 
 /**
  * @swagger
@@ -169,7 +178,12 @@ router.post("/", governmentEvaluationController.createGovernmentEvaluation);
  *       404:
  *         description: Not found
  */
-router.put("/:id", governmentEvaluationController.updateGovernmentEvaluation);
+router.put(
+  "/:id",
+  verifyToken,
+  authorizeRole("admin"),
+  governmentEvaluationController.updateGovernmentEvaluation
+);
 
 /**
  * @swagger
@@ -192,7 +206,9 @@ router.put("/:id", governmentEvaluationController.updateGovernmentEvaluation);
  */
 router.delete(
   "/:id",
-  governmentEvaluationController.deleteGovernmentEvaluation,
+  verifyToken,
+  authorizeRole("admin"),
+  governmentEvaluationController.deleteGovernmentEvaluation
 );
 
 module.exports = router;

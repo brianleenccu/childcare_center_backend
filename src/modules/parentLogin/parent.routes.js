@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 const controller = require("./parent.controller");
+const {
+  verifyToken,
+  authorizeRole,
+} = require("../../core/config/middleware/auth.middleware");
 
 /**
  * @swagger
@@ -78,5 +82,45 @@ router.post("/register", controller.registerParent);
  *         description: 伺服器錯誤
  */
 router.post("/login", controller.loginParent);
-
+/**
+ * @swagger
+ * /api/parent/{id}:
+ *   put:
+ *     summary: 更新家長個人資料
+ *     tags: [Parent]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: 家長的 parent_id
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *
+ *     responses:
+ *       200:
+ *         description: 更新成功
+ *
+ *       403:
+ *         description: 權限不足
+ */
+router.put(
+  "/:id",
+  verifyToken,
+  authorizeRole("parent"),
+  controller.updateProfile
+);
 module.exports = router;

@@ -67,6 +67,7 @@ const loginAdmin = async (req, res) => {
         centeraccount_id: admin.centeraccount_id, // 若你的主鍵叫做 id，請改成 admin.id
         // 即使還沒綁定中心 (null)，也先包進去，後端警衛會根據此值判斷是否能進行機構操作
         center_id: admin.center_id || null,
+        role: "admin",
       },
       process.env.JWT_SECRET, // 拿出 .env 裡的最高機密鑰匙來上鎖
       { expiresIn: "1d" } // 設定這張通行證 1 天後過期
@@ -80,7 +81,8 @@ const loginAdmin = async (req, res) => {
       data: {
         username: admin.username,
         centeraccount_id: admin.centeraccount_id,
-        center_id: admin.center_id, // 告訴前端該管理員是否已經擁有管理的中心
+        center_id: admin.center_id,
+        role: "admin", // 告訴前端該管理員是否已經擁有管理的中心
       },
     });
   } catch (err) {

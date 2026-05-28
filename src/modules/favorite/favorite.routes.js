@@ -1,7 +1,11 @@
-const { Router } = require('express');
-const ctrl = require('./favorite.controller');
+const { Router } = require("express");
+const ctrl = require("./favorite.controller");
 
 const router = Router();
+const {
+  verifyToken,
+  authorizeRole,
+} = require("../../core/config/middleware/auth.middleware");
 
 /**
  * @swagger
@@ -52,7 +56,7 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/FavoriteItem'
  */
-router.post('/', ctrl.create);
+router.post("/", verifyToken, authorizeRole("parent"), ctrl.create);
 
 /**
  * @swagger
@@ -92,7 +96,7 @@ router.post('/', ctrl.create);
  *       404:
  *         description: Not found
  */
-router.get('/:id', ctrl.getById);
-router.delete('/:id', ctrl.remove);
+router.get("/:id", ctrl.getById);
+router.delete("/:id", verifyToken, authorizeRole("parent"), ctrl.remove);
 
 module.exports = router;
