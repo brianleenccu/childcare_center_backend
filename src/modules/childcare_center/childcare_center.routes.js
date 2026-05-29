@@ -470,6 +470,33 @@ router.put("/:id", verifyToken, authorizeRole("admin"), ctrl.update);
  *         description: Not found
  */
 router.delete("/:id", ctrl.remove);
+/**
+ * @swagger
+ * /api/childcare-centers/{id}/compare-details:
+ *   get:
+ *     summary: 取得機構比較專用完整資料 (BFF 聚合 API)
+ *     description: 一次性取得基本資料、師資、招生狀態與政府評鑑，供前端比較頁面使用。
+ *     tags: [ChildcareCenter]
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: 機構的 center_id (例如：1)
+ *
+ *     responses:
+ *       200:
+ *         description: 成功取得聚合資料
+ *
+ *       404:
+ *         description: 找不到該機構
+ *
+ *       500:
+ *         description: 伺服器內部錯誤
+ */
+
 router.get("/:id/compare-details", ctrl.getCompareDetails);
 
 module.exports = router;

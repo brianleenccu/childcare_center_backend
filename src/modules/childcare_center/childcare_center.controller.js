@@ -16,10 +16,10 @@ const getCompareDetails = async (req, res) => {
     // 🚀 核心魔法：Promise.all 讓四個資料庫查詢「同時並行」，速度極快！
     const [basicInfo, staffList, enrollmentStatus, evaluations] =
       await Promise.all([
-        childcareService.getCenterById(centerId), // 1. 基本資料
+        childcareService.getById(centerId), // 1. 基本資料
         staffService.getStaffByCenterId(centerId), // 2. 師資陣列
-        enrollmentService.getStatusByCenterId(centerId), // 3. 招生狀態
-        evaluationService.getEvaluationsByCenterId(centerId), // 4. 評鑑紀錄
+        enrollmentService.getEnrollmentStatusByCenterId(centerId), // 3. 招生狀態
+        evaluationService.getGovernmentEvaluationsByCenterId(centerId), // 4. 評鑑紀錄
       ]);
 
     if (!basicInfo) {
