@@ -1,6 +1,10 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const service = require("./parent.service");
+const {
+  verifyToken,
+  authorizeRole,
+} = require("../../core/config/middleware/auth.middleware");
 
 // 家長註冊
 const registerParent = async (req, res) => {
@@ -85,6 +89,7 @@ const loginParent = async (req, res) => {
       data: {
         parent_id: parent.parent_id,
         name: parent.name,
+        role: "parent",
       },
     });
   } catch (err) {
@@ -92,5 +97,44 @@ const loginParent = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+// 家長更新個人資料
+const updateProfile = async (req, res) => {
+  try {
+    const parentId = parseInt(req.params.id);
+    const { name, email, phone } = req.body;
 
-module.exports = { registerParent, loginParent };
+    // 🛡️ 資安防禦：確保登入的家長 (req.user) 只能修改自己的 ID 資料
+    if (req.user.parent_id !== parentId) {
+      return res.status(403).json({ error: "權限不足：只能修改自己的資料！" });
+    }
+
+    if (!name || !email) {
+      return res.status(400).json({ error: "姓名與信箱為必填欄位" });
+    }
+
+    const updatedParent = await service.updateParentProfile(parentId, {
+      name,
+      email,
+      phone,
+    });
+
+    if (!updatedParent) {
+      return res.status(404).json({ error: "找不到該家長資料" });
+    }
+
+    res.json({
+      success: true,
+      message: "個人資料更新成功！",
+      data: updatedParent,
+    });
+  } catch (err) {
+    console.error("❌ 更新資料錯誤:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+module.exports = {
+  registerParent,
+  loginParent,
+  updateProfile,
+};

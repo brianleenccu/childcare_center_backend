@@ -1,4 +1,50 @@
-const service = require('./childcare_center.service');
+const service = require("./childcare_center.service");
+//----------------------------------------------------------------------------
+//製作compare專用的controller，讓前端一次拿到四個模組的資料，提升比較頁面的效能和使用體驗
+//----------------------------------------------------------------------------
+// 🌟 1. 確保你有在檔案最上方引入這四個模組的 Service (路徑請依你的專案架構微調)
+
+const childcareService = require("./childcare_center.service");
+const staffService = require("../staff/staff.service");
+const enrollmentService = require("../enrollment_status/enrollment_status.service");
+const evaluationService = require("../government_evaluation/government_evaluation.service");
+// 🌟 2. 建立比較專用的聚合 API
+const getCompareDetails = async (req, res) => {
+  try {
+    const centerId = parseInt(req.params.id);
+
+    // 🚀 核心魔法：Promise.all 讓四個資料庫查詢「同時並行」，速度極快！
+    const [basicInfo, staffList, enrollmentStatus, evaluations] =
+      await Promise.all([
+        childcareService.getById(centerId), // 1. 基本資料
+        staffService.getStaffByCenterId(centerId), // 2. 師資陣列
+        enrollmentService.getEnrollmentStatusByCenterId(centerId), // 3. 招生狀態
+        evaluationService.getGovernmentEvaluationsByCenterId(centerId), // 4. 評鑑紀錄
+      ]);
+
+    if (!basicInfo) {
+      return res.status(404).json({ error: "找不到該機構資料" });
+    }
+
+    // 📦 將四散的資料打包成一個結構清晰的 JSON 回傳給前端
+    res.json({
+      success: true,
+      data: {
+        center_id: centerId,
+        basic_info: basicInfo,
+        staff: staffList || [],
+        // 處理 enrollment 可能是陣列或單一物件的狀況
+        enrollment_status: Array.isArray(enrollmentStatus)
+          ? enrollmentStatus[0]
+          : enrollmentStatus || null,
+        government_evaluations: evaluations || [],
+      },
+    });
+  } catch (err) {
+    console.error("❌ 獲取比較資料失敗:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
 
 const getAll = async (req, res) => {
   try {
@@ -57,7 +103,8 @@ const searchByCapacity = async (req, res) => {
 
 const searchByOperationType = async (req, res) => {
   try {
-    if (!req.query.type) return res.status(400).json({ error: 'type is required' });
+    if (!req.query.type)
+      return res.status(400).json({ error: "type is required" });
     const data = await service.searchByOperationType(req.query.type);
     res.json(data);
   } catch (err) {
@@ -67,7 +114,8 @@ const searchByOperationType = async (req, res) => {
 
 const searchByDistrict = async (req, res) => {
   try {
-    if (!req.query.district) return res.status(400).json({ error: 'district is required' });
+    if (!req.query.district)
+      return res.status(400).json({ error: "district is required" });
     const data = await service.searchByDistrict(req.query.district);
     res.json(data);
   } catch (err) {
@@ -77,7 +125,8 @@ const searchByDistrict = async (req, res) => {
 
 const searchByCategory = async (req, res) => {
   try {
-    if (!req.query.category) return res.status(400).json({ error: 'category is required' });
+    if (!req.query.category)
+      return res.status(400).json({ error: "category is required" });
     const data = await service.searchByCategory(req.query.category);
     res.json(data);
   } catch (err) {
@@ -88,7 +137,10 @@ const searchByCategory = async (req, res) => {
 const searchByTimeRange = async (req, res) => {
   try {
     const { open_time, close_time } = req.query;
-    if (!open_time || !close_time) return res.status(400).json({ error: 'open_time and close_time are required' });
+    if (!open_time || !close_time)
+      return res
+        .status(400)
+        .json({ error: "open_time and close_time are required" });
     const data = await service.searchByTimeRange(open_time, close_time);
     res.json(data);
   } catch (err) {
@@ -98,7 +150,8 @@ const searchByTimeRange = async (req, res) => {
 
 const searchByTeacherStudentRatio = async (req, res) => {
   try {
-    if (!req.query.ratio) return res.status(400).json({ error: 'ratio is required' });
+    if (!req.query.ratio)
+      return res.status(400).json({ error: "ratio is required" });
     const data = await service.searchByTeacherStudentRatio(req.query.ratio);
     res.json(data);
   } catch (err) {
@@ -108,12 +161,35 @@ const searchByTeacherStudentRatio = async (req, res) => {
 
 const searchByFilters = async (req, res) => {
   try {
-    const { range, type, category, district, ratio, open_time, close_time } = req.query;
-    const data = await service.searchByFilters({ range, type, category, district, ratio, open_time, close_time });
+    const { range, type, category, district, ratio, open_time, close_time } =
+      req.query;
+    const data = await service.searchByFilters({
+      range,
+      type,
+      category,
+      district,
+      ratio,
+      open_time,
+      close_time,
+    });
     res.json(data);
   } catch (err) {
     res.status(err.status || 500).json({ error: err.message });
   }
 };
 
-module.exports = { getAll, getById, create, update, remove, searchByCapacity, searchByOperationType, searchByDistrict, searchByCategory, searchByTimeRange, searchByTeacherStudentRatio, searchByFilters };
+module.exports = {
+  getCompareDetails,
+  getAll,
+  getById,
+  create,
+  update,
+  remove,
+  searchByCapacity,
+  searchByOperationType,
+  searchByDistrict,
+  searchByCategory,
+  searchByTimeRange,
+  searchByTeacherStudentRatio,
+  searchByFilters,
+};

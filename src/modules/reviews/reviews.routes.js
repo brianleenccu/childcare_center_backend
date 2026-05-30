@@ -1,6 +1,9 @@
-const { Router } = require('express');
-const ctrl = require('./reviews.controller');
-
+const { Router } = require("express");
+const ctrl = require("./reviews.controller");
+const {
+  verifyToken,
+  authorizeRole,
+} = require("../../core/config/middleware/auth.middleware");
 const router = Router();
 
 /**
@@ -34,7 +37,9 @@ const router = Router();
  *           nullable: true
  *         created_at:
  *           type: string
- *           format: date-time
+ *           example: "2026-05-22 14:09:21.966028"
+ *           description: "Set automatically by the server (timestamp)"
+ *           readOnly: true
  *           nullable: true
  */
 
@@ -74,7 +79,7 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Review'
  */
-router.post('/', ctrl.create);
+router.post("/", verifyToken, authorizeRole("parent"), ctrl.create);
 
 /**
  * @swagger
@@ -148,8 +153,8 @@ router.post('/', ctrl.create);
  *       404:
  *         description: Not found
  */
-router.get('/:id', ctrl.getById);
-router.put('/:id', ctrl.update);
-router.delete('/:id', ctrl.remove);
+router.get("/:id", ctrl.getById);
+router.put("/:id", ctrl.update);
+router.delete("/:id", ctrl.remove);
 
 module.exports = router;

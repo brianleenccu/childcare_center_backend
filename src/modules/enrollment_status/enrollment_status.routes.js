@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 const enrollmentStatusController = require("./enrollment_status.controller");
+const {
+  verifyToken,
+  authorizeRole,
+} = require("../../core/config/middleware/auth.middleware");
 
 /**
  * @swagger
@@ -85,7 +89,7 @@ router.get("/", enrollmentStatusController.getAllEnrollmentStatus);
  */
 router.get(
   "/center/:centerId",
-  enrollmentStatusController.getEnrollmentStatusByCenterId,
+  enrollmentStatusController.getEnrollmentStatusByCenterId
 );
 
 /**
@@ -123,7 +127,12 @@ router.get("/:id", enrollmentStatusController.getEnrollmentStatusById);
  *       201:
  *         description: Created enrollment status record
  */
-router.post("/", enrollmentStatusController.createEnrollmentStatus);
+router.post(
+  "/",
+  verifyToken,
+  authorizeRole("admin"),
+  enrollmentStatusController.createEnrollmentStatus
+);
 
 /**
  * @swagger
@@ -148,7 +157,12 @@ router.post("/", enrollmentStatusController.createEnrollmentStatus);
  *       200:
  *         description: Updated enrollment status record
  */
-router.put("/:id", enrollmentStatusController.updateEnrollmentStatus);
+router.put(
+  "/:id",
+  verifyToken,
+  authorizeRole("admin"),
+  enrollmentStatusController.updateEnrollmentStatus
+);
 
 /**
  * @swagger

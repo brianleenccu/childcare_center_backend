@@ -9,11 +9,12 @@ const getById = async (id) => {
 const SCORE_FIELDS = ['score_staff', 'score_environment', 'score_curriculum'];
 
 const createReview = async (payload) => {
-  const { score_overall, review_id, ...safePayload } = payload;
+  const { score_overall, review_id, created_at, ...safePayload } = payload;
+  safePayload.created_at = new Date();
 
   const { score_staff, score_environment, score_curriculum } = safePayload;
   if (score_staff != null && score_environment != null && score_curriculum != null) {
-    safePayload.score_overall = Math.round((score_staff + score_environment + score_curriculum) / 3 * 10) / 10;
+    safePayload.score_overall = Math.round((Number(score_staff) + Number(score_environment) + Number(score_curriculum)) / 3 * 10) / 10;
   }
 
   return model.create(safePayload);
@@ -26,11 +27,11 @@ const updateReview = async (id, payload) => {
 
   const hasScoreUpdate = SCORE_FIELDS.some((f) => f in safePayload);
   if (hasScoreUpdate) {
-    const staff      = safePayload.score_staff      ?? current.score_staff;
-    const env        = safePayload.score_environment ?? current.score_environment;
-    const curriculum = safePayload.score_curriculum ?? current.score_curriculum;
+    const staff      = Number(safePayload.score_staff      ?? current.score_staff);
+    const env        = Number(safePayload.score_environment ?? current.score_environment);
+    const curriculum = Number(safePayload.score_curriculum  ?? current.score_curriculum);
 
-    if (staff != null && env != null && curriculum != null) {
+    if (!isNaN(staff) && !isNaN(env) && !isNaN(curriculum)) {
       safePayload.score_overall = Math.round((staff + env + curriculum) / 3 * 10) / 10;
     }
   }

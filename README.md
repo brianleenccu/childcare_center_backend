@@ -96,6 +96,6 @@ Base URL：`/api/reviews`
 | `score_environment` | integer | 環境評分 |
 | `score_curriculum` | integer | 課程評分 |
 | `comment` | string | 文字評論 |
-| `created_at` | timestamp | 建立時間，由前端傳入 |
+| `created_at` | timestamp | 建立時間，由後端自動設定 |
 
 > `score_overall` 不可由使用者自行傳入，系統會在新增或更新時自動計算。

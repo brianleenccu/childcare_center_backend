@@ -1,8 +1,11 @@
-const { Router } = require('express');
-const ctrl = require('./childcare_center.controller');
+const { Router } = require("express");
+const ctrl = require("./childcare_center.controller");
 
 const router = Router();
-
+const {
+  verifyToken,
+  authorizeRole,
+} = require("../../core/config/middleware/auth.middleware");
 /**
  * @swagger
  * components:
@@ -55,11 +58,15 @@ const router = Router();
  *           type: integer
  *         updated_at:
  *           type: string
- *           example: "2024-06-01 02:00:00"
- *           description: "timestamp format: YYYY-MM-DD HH:MM:SS"
+ *           example: "2026-05-22 14:09:21.966028"
+ *           description: "Set automatically by the server (timestamp)"
+ *           readOnly: true
  *         created_at:
  *           type: string
  *           format: date
+ *           example: "2024-01-24"
+ *           description: "Set automatically by the server (date)"
+ *           readOnly: true
  *     ChildcareCenterInput:
  *       type: object
  *       properties:
@@ -104,12 +111,6 @@ const router = Router();
  *           example: "18:30:00"
  *         centeraccount_id:
  *           type: integer
- *         updated_at:
- *           type: string
- *           example: "2024-06-01 02:00:00"
- *         created_at:
- *           type: string
- *           format: date
  */
 
 /**
@@ -128,7 +129,7 @@ const router = Router();
  *               items:
  *                 $ref: '#/components/schemas/ChildcareCenter'
  */
-router.get('/', ctrl.getAll);
+router.get("/", ctrl.getAll);
 
 /**
  * @swagger
@@ -156,7 +157,7 @@ router.get('/', ctrl.getAll);
  *       400:
  *         description: Invalid range value
  */
-router.get('/search/capacity', ctrl.searchByCapacity);
+router.get("/search/capacity", ctrl.searchByCapacity);
 
 /**
  * @swagger
@@ -184,7 +185,7 @@ router.get('/search/capacity', ctrl.searchByCapacity);
  *       400:
  *         description: type parameter is required
  */
-router.get('/search/operation-type', ctrl.searchByOperationType);
+router.get("/search/operation-type", ctrl.searchByOperationType);
 
 /**
  * @swagger
@@ -212,7 +213,7 @@ router.get('/search/operation-type', ctrl.searchByOperationType);
  *       400:
  *         description: Invalid or missing category value
  */
-router.get('/search/category', ctrl.searchByCategory);
+router.get("/search/category", ctrl.searchByCategory);
 
 /**
  * @swagger
@@ -240,7 +241,7 @@ router.get('/search/category', ctrl.searchByCategory);
  *       400:
  *         description: Invalid or missing district value
  */
-router.get('/search/district', ctrl.searchByDistrict);
+router.get("/search/district", ctrl.searchByDistrict);
 
 /**
  * @swagger
@@ -269,7 +270,7 @@ router.get('/search/district', ctrl.searchByDistrict);
  *       400:
  *         description: Invalid or missing ratio value
  */
-router.get('/search/ratio', ctrl.searchByTeacherStudentRatio);
+router.get("/search/ratio", ctrl.searchByTeacherStudentRatio);
 
 /**
  * @swagger
@@ -305,7 +306,7 @@ router.get('/search/ratio', ctrl.searchByTeacherStudentRatio);
  *       400:
  *         description: open_time or close_time missing or invalid
  */
-router.get('/search/time', ctrl.searchByTimeRange);
+router.get("/search/time", ctrl.searchByTimeRange);
 
 /**
  * @swagger
@@ -369,7 +370,7 @@ router.get('/search/time', ctrl.searchByTimeRange);
  *       400:
  *         description: Invalid parameter value
  */
-router.get('/search', ctrl.searchByFilters);
+router.get("/search", ctrl.searchByFilters);
 
 /**
  * @swagger
@@ -394,7 +395,7 @@ router.get('/search', ctrl.searchByFilters);
  *       404:
  *         description: Not found
  */
-router.get('/:id', ctrl.getById);
+router.get("/:id", ctrl.getById);
 
 /**
  * @swagger
@@ -416,7 +417,7 @@ router.get('/:id', ctrl.getById);
  *             schema:
  *               $ref: '#/components/schemas/ChildcareCenter'
  */
-router.post('/', ctrl.create);
+router.post("/", verifyToken, authorizeRole("admin"), ctrl.create);
 
 /**
  * @swagger
@@ -447,7 +448,7 @@ router.post('/', ctrl.create);
  *       404:
  *         description: Not found
  */
-router.put('/:id', ctrl.update);
+router.put("/:id", verifyToken, authorizeRole("admin"), ctrl.update);
 
 /**
  * @swagger
@@ -468,6 +469,34 @@ router.put('/:id', ctrl.update);
  *       404:
  *         description: Not found
  */
-router.delete('/:id', ctrl.remove);
+router.delete("/:id", ctrl.remove);
+/**
+ * @swagger
+ * /api/childcare-centers/{id}/compare-details:
+ *   get:
+ *     summary: 取得機構比較專用完整資料 (BFF 聚合 API)
+ *     description: 一次性取得基本資料、師資、招生狀態與政府評鑑，供前端比較頁面使用。
+ *     tags: [ChildcareCenter]
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: 機構的 center_id (例如：1)
+ *
+ *     responses:
+ *       200:
+ *         description: 成功取得聚合資料
+ *
+ *       404:
+ *         description: 找不到該機構
+ *
+ *       500:
+ *         description: 伺服器內部錯誤
+ */
+
+router.get("/:id/compare-details", ctrl.getCompareDetails);
 
 module.exports = router;

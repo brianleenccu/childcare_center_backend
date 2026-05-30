@@ -3,6 +3,10 @@ const multer = require("multer");
 const router = express.Router();
 const upload = multer();
 const controller = require("./photo.controller");
+const {
+  verifyToken,
+  authorizeRole,
+} = require("../../core/config/middleware/auth.middleware");
 
 /**
  * @swagger
@@ -42,7 +46,13 @@ const controller = require("./photo.controller");
  *       500:
  *         description: 伺服器錯誤
  */
-router.post("/upload", upload.single("photoblob"), controller.uploadPhoto);
+router.post(
+  "/upload",
+  verifyToken,
+  authorizeRole("admin"),
+  upload.single("photoblob"),
+  controller.uploadPhoto
+);
 /**
  * @swagger
  * /api/photo/center/{center_id}:
@@ -178,7 +188,12 @@ router.get("/center/:center_id", controller.getCenterPhotos);
  *       500:
  *         description: 伺服器錯誤
  */
-router.patch("/:center_id/:photo_id/caption", controller.updateCaption);
+router.patch(
+  "/:center_id/:photo_id/caption",
+  verifyToken,
+  authorizeRole("admin"),
+  controller.updateCaption
+);
 
 /**
  * @swagger
@@ -238,7 +253,12 @@ router.patch("/:center_id/:photo_id/caption", controller.updateCaption);
  *       500:
  *         description: 伺服器錯誤
  */
-router.delete("/:center_id/:photo_id", controller.deletePhoto);
+router.delete(
+  "/:center_id/:photo_id",
+  verifyToken,
+  authorizeRole("admin"),
+  controller.deletePhoto
+);
 /**
  * @swagger
  * /api/photo/{center_id}/{photo_id}/caption:

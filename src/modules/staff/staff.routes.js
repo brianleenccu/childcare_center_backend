@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 const staffController = require("./staff.controller");
+const {
+  verifyToken,
+  authorizeRole,
+} = require("../../core/config/middleware/auth.middleware");
 
 /**
  * @swagger
@@ -125,7 +129,12 @@ router.get("/:id", staffController.getStaffById);
  *             schema:
  *               $ref: '#/components/schemas/Staff'
  */
-router.post("/", staffController.createStaff);
+router.post(
+  "/",
+  verifyToken,
+  authorizeRole("admin"),
+  staffController.createStaff
+);
 
 /**
  * @swagger
@@ -156,7 +165,12 @@ router.post("/", staffController.createStaff);
  *       404:
  *         description: Not found
  */
-router.put("/:id", staffController.updateStaff);
+router.put(
+  "/:id",
+  verifyToken,
+  authorizeRole("admin"),
+  staffController.updateStaff
+);
 
 /**
  * @swagger
@@ -177,6 +191,11 @@ router.put("/:id", staffController.updateStaff);
  *       404:
  *         description: Not found
  */
-router.delete("/:id", staffController.deleteStaff);
+router.delete(
+  "/:id",
+  verifyToken,
+  authorizeRole("admin"),
+  staffController.deleteStaff
+);
 
 module.exports = router;
