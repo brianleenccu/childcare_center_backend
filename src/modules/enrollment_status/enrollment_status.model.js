@@ -1,44 +1,30 @@
-const { createClient } = require("@supabase/supabase-js");
+const pool = require("../../core/config/db");
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Missing Supabase URL or anon key in environment variables.");
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+const TABLE = "enrollment_status";
 
 exports.getAllEnrollmentStatus = async () => {
-  const { data, error } = await supabase
-    .from("enrollment_status")
-    .select("*")
-    .order("enrollment_id", { ascending: true });
-
-  if (error) throw error;
-  return data;
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} ORDER BY enrollment_id ASC`,
+  );
+  return result.rows;
 };
 
 exports.getEnrollmentStatusById = async (id) => {
-  const { data, error } = await supabase
-    .from("enrollment_status")
-    .select("*")
-    .eq("enrollment_id", id)
-    .single();
-
-  if (error) throw error;
-  return data;
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} WHERE enrollment_id = $1`,
+    [id],
+  );
+  return result.rows[0] || null;
 };
 
 exports.getEnrollmentStatusByCenterId = async (centerId) => {
-  const { data, error } = await supabase
-    .from("enrollment_status")
-    .select("*")
-    .eq("center_id", centerId)
-    .order("enrollment_id", { ascending: true });
-
-  if (error) throw error;
-  return data;
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE}
+     WHERE center_id = $1
+     ORDER BY enrollment_id ASC`,
+    [centerId],
+  );
+  return result.rows;
 };
 
 exports.createEnrollmentStatus = async (record) => {
@@ -47,13 +33,17 @@ exports.createEnrollmentStatus = async (record) => {
     updated_at: new Date().toISOString(),
   };
 
-  const { data, error } = await supabase
-    .from("enrollment_status")
-    .insert([payload])
-    .select();
+  const keys = Object.keys(payload);
+  const values = Object.values(payload);
+  const columns = keys.join(", ");
+  const params = keys.map((_, index) => `$${index + 1}`).join(", ");
 
-  if (error) throw error;
-  return data;
+  const result = await pool.query(
+    `INSERT INTO ${TABLE} (${columns}) VALUES (${params}) RETURNING *`,
+    values,
+  );
+
+  return result.rows[0];
 };
 
 exports.updateEnrollmentStatus = async (id, updates) => {
@@ -62,25 +52,33 @@ exports.updateEnrollmentStatus = async (id, updates) => {
     updated_at: new Date().toISOString(),
   };
 
-  const { data, error } = await supabase
-    .from("enrollment_status")
-    .update(payload)
-    .eq("enrollment_id", id)
-    .select();
+  const keys = Object.keys(payload);
+  const values = Object.values(payload);
 
-  if (error) throw error;
-  return data;
+  if (keys.length === 0) {
+    throw new Error("No fields provided for update.");
+  }
+
+  const setClause = keys
+    .map((key, index) => `${key} = $${index + 1}`)
+    .join(", ");
+
+  const result = await pool.query(
+    `UPDATE ${TABLE}
+     SET ${setClause}
+     WHERE enrollment_id = $${keys.length + 1}
+     RETURNING *`,
+    [...values, id],
+  );
+
+  return result.rows[0] || null;
 };
 
 exports.deleteEnrollmentStatus = async (id) => {
-  const { error } = await supabase
-    .from("enrollment_status")
-    .delete()
-    .eq("enrollment_id", id);
+  const result = await pool.query(
+    `DELETE FROM ${TABLE} WHERE enrollment_id = $1 RETURNING *`,
+    [id],
+  );
 
-  if (error) throw error;
-
-  return {
-    message: "Enrollment status deleted successfully",
-  };
+  return result.rows[0] || null;
 };

@@ -1,76 +1,92 @@
-const { createClient } = require("@supabase/supabase-js");
+const pool = require("../../core/config/db");
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const TABLE = "evaluation_record";
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Missing Supabase URL or anon key in environment variables.");
-}
+const normalizeGovernmentEvaluationPayload = (payload) => {
+  const normalized = { ...payload };
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+  if (
+    Object.prototype.hasOwnProperty.call(normalized, "evaluation_result") &&
+    !Object.prototype.hasOwnProperty.call(normalized, "evalution_result")
+  ) {
+    normalized.evalution_result = normalized.evaluation_result;
+    delete normalized.evaluation_result;
+  }
+
+  return normalized;
+};
 
 exports.getAllGovernmentEvaluations = async () => {
-  const { data, error } = await supabase
-    .from("evaluation_record")
-    .select("*")
-    .order("evaluation_id", { ascending: true });
-
-  if (error) throw error;
-  return data;
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} ORDER BY evaluation_id ASC`,
+  );
+  return result.rows;
 };
 
 exports.getGovernmentEvaluationById = async (id) => {
-  const { data, error } = await supabase
-    .from("evaluation_record")
-    .select("*")
-    .eq("evaluation_id", id)
-    .single();
-
-  if (error) throw error;
-  return data;
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} WHERE evaluation_id = $1`,
+    [id],
+  );
+  return result.rows[0] || null;
 };
 
 exports.getGovernmentEvaluationsByCenterId = async (centerId) => {
-  const { data, error } = await supabase
-    .from("evaluation_record")
-    .select("*")
-    .eq("center_id", centerId)
-    .order("completion_date", { ascending: false });
-
-  if (error) throw error;
-  return data;
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE}
+     WHERE center_id = $1
+     ORDER BY completion_date DESC`,
+    [centerId],
+  );
+  return result.rows;
 };
 
 exports.createGovernmentEvaluation = async (record) => {
-  const { data, error } = await supabase
-    .from("evaluation_record")
-    .insert([record])
-    .select();
+  const payload = normalizeGovernmentEvaluationPayload(record);
 
-  if (error) throw error;
-  return data;
+  const keys = Object.keys(payload);
+  const values = Object.values(payload);
+  const columns = keys.join(", ");
+  const params = keys.map((_, index) => `$${index + 1}`).join(", ");
+
+  const result = await pool.query(
+    `INSERT INTO ${TABLE} (${columns}) VALUES (${params}) RETURNING *`,
+    values,
+  );
+
+  return result.rows[0];
 };
 
 exports.updateGovernmentEvaluation = async (id, updates) => {
-  const { data, error } = await supabase
-    .from("evaluation_record")
-    .update(updates)
-    .eq("evaluation_id", id)
-    .select();
+  const payload = normalizeGovernmentEvaluationPayload(updates);
 
-  if (error) throw error;
-  return data;
+  const keys = Object.keys(payload);
+  const values = Object.values(payload);
+
+  if (keys.length === 0) {
+    throw new Error("No fields provided for update.");
+  }
+
+  const setClause = keys
+    .map((key, index) => `${key} = $${index + 1}`)
+    .join(", ");
+
+  const result = await pool.query(
+    `UPDATE ${TABLE}
+     SET ${setClause}
+     WHERE evaluation_id = $${keys.length + 1}
+     RETURNING *`,
+    [...values, id],
+  );
+
+  return result.rows[0] || null;
 };
 
 exports.deleteGovernmentEvaluation = async (id) => {
-  const { error } = await supabase
-    .from("evaluation_record")
-    .delete()
-    .eq("evaluation_id", id);
+  const result = await pool.query(
+    `DELETE FROM ${TABLE} WHERE evaluation_id = $1 RETURNING *`,
+    [id],
+  );
 
-  if (error) throw error;
-
-  return {
-    message: "Government evaluation deleted successfully",
-  };
+  return result.rows[0] || null;
 };

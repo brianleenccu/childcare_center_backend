@@ -1,70 +1,72 @@
-const { createClient } = require("@supabase/supabase-js");
+const pool = require("../../core/config/db");
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Missing Supabase URL or anon key in environment variables.");
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+const TABLE = "staff";
 
 exports.getAllStaff = async () => {
-  const { data, error } = await supabase
-    .from("staff")
-    .select("*")
-    .order("staff_id", { ascending: true });
-
-  if (error) throw error;
-  return data;
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} ORDER BY staff_id ASC`,
+  );
+  return result.rows;
 };
 
 exports.getStaffById = async (id) => {
-  const { data, error } = await supabase
-    .from("staff")
-    .select("*")
-    .eq("staff_id", id)
-    .single();
-
-  if (error) throw error;
-  return data;
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} WHERE staff_id = $1`,
+    [id],
+  );
+  return result.rows[0] || null;
 };
 
 exports.getStaffByCenterId = async (centerId) => {
-  const { data, error } = await supabase
-    .from("staff")
-    .select("*")
-    .eq("center_id", centerId)
-    .order("staff_id", { ascending: true });
-
-  if (error) throw error;
-  return data;
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} WHERE center_id = $1 ORDER BY staff_id ASC`,
+    [centerId],
+  );
+  return result.rows;
 };
 
 exports.createStaff = async (staff) => {
-  const { data, error } = await supabase.from("staff").insert([staff]).select();
+  const keys = Object.keys(staff);
+  const values = Object.values(staff);
+  const columns = keys.join(", ");
+  const params = keys.map((_, index) => `$${index + 1}`).join(", ");
 
-  if (error) throw error;
-  return data;
+  const result = await pool.query(
+    `INSERT INTO ${TABLE} (${columns}) VALUES (${params}) RETURNING *`,
+    values,
+  );
+
+  return result.rows[0];
 };
 
 exports.updateStaff = async (id, updates) => {
-  const { data, error } = await supabase
-    .from("staff")
-    .update(updates)
-    .eq("staff_id", id)
-    .select();
+  const keys = Object.keys(updates);
+  const values = Object.values(updates);
 
-  if (error) throw error;
-  return data;
+  if (keys.length === 0) {
+    throw new Error("No fields provided for update.");
+  }
+
+  const setClause = keys
+    .map((key, index) => `${key} = $${index + 1}`)
+    .join(", ");
+
+  const result = await pool.query(
+    `UPDATE ${TABLE}
+     SET ${setClause}
+     WHERE staff_id = $${keys.length + 1}
+     RETURNING *`,
+    [...values, id],
+  );
+
+  return result.rows[0] || null;
 };
 
 exports.deleteStaff = async (id) => {
-  const { error } = await supabase.from("staff").delete().eq("staff_id", id);
+  const result = await pool.query(
+    `DELETE FROM ${TABLE} WHERE staff_id = $1 RETURNING *`,
+    [id],
+  );
 
-  if (error) throw error;
-
-  return {
-    message: "Staff deleted successfully",
-  };
+  return result.rows[0] || null;
 };
