@@ -42,4 +42,20 @@ const remove = async (id) => {
   );
 };
 
-module.exports = { findById, create, update, remove };
+const findByParentId = async (parentId) => {
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} WHERE parent_id = $1 ORDER BY created_at DESC`,
+    [parentId]
+  );
+  return result.rows;
+};
+
+const findByCenterId = async (centerId) => {
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} WHERE center_id = $1 ORDER BY created_at DESC`,
+    [centerId]
+  );
+  return result.rows;
+};
+
+module.exports = { findById, findByParentId, findByCenterId, create, update, remove };

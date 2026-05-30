@@ -44,4 +44,12 @@ const deleteReview = async (id) => {
   return model.remove(id);
 };
 
-module.exports = { getById, createReview, updateReview, deleteReview };
+const getByParentId = async (parentId) => {
+  return model.findByParentId(parentId);
+};
+
+const getByCenterId = async (centerId) => {
+  return model.findByCenterId(centerId);
+};
+
+module.exports = { getById, getByParentId, getByCenterId, createReview, updateReview, deleteReview };

@@ -153,6 +153,56 @@ router.post("/", verifyToken, authorizeRole("parent"), ctrl.create);
  *       404:
  *         description: Not found
  */
+/**
+ * @swagger
+ * /api/reviews/parent/{parentId}:
+ *   get:
+ *     summary: Get all reviews by parent ID
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: parentId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: parent_id to filter reviews
+ *     responses:
+ *       200:
+ *         description: List of reviews for the given parent
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Review'
+ */
+router.get("/parent/:parentId", ctrl.getByParentId);
+
+/**
+ * @swagger
+ * /api/reviews/center/{centerId}:
+ *   get:
+ *     summary: Get all reviews by center ID
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: centerId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: center_id to filter reviews
+ *     responses:
+ *       200:
+ *         description: List of reviews for the given center
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Review'
+ */
+router.get("/center/:centerId", ctrl.getByCenterId);
+
 router.get("/:id", ctrl.getById);
 router.put("/:id", ctrl.update);
 router.delete("/:id", ctrl.remove);

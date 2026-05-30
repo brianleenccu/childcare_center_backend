@@ -96,6 +96,31 @@ router.post("/", verifyToken, authorizeRole("parent"), ctrl.create);
  *       404:
  *         description: Not found
  */
+/**
+ * @swagger
+ * /api/favorites/parent/{parentId}:
+ *   get:
+ *     summary: Get all favorites by parent ID
+ *     tags: [Favorites]
+ *     parameters:
+ *       - in: path
+ *         name: parentId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: parent_id to filter favorite items
+ *     responses:
+ *       200:
+ *         description: List of favorite items for the given parent
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/FavoriteItem'
+ */
+router.get("/parent/:parentId", ctrl.getByParentId);
+
 router.get("/:id", ctrl.getById);
 router.delete("/:id", verifyToken, authorizeRole("parent"), ctrl.remove);
 

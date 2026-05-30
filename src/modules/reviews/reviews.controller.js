@@ -36,4 +36,22 @@ const remove = async (req, res) => {
   }
 };
 
-module.exports = { getById, create, update, remove };
+const getByParentId = async (req, res) => {
+  try {
+    const reviews = await service.getByParentId(req.params.parentId);
+    res.json(reviews);
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message });
+  }
+};
+
+const getByCenterId = async (req, res) => {
+  try {
+    const reviews = await service.getByCenterId(req.params.centerId);
+    res.json(reviews);
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message });
+  }
+};
+
+module.exports = { getById, getByParentId, getByCenterId, create, update, remove };

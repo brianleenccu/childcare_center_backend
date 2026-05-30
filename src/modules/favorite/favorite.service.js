@@ -17,4 +17,8 @@ const deleteFavorite = async (id) => {
   return model.remove(id);
 };
 
-module.exports = { getById, createFavorite, deleteFavorite };
+const getByParentId = async (parentId) => {
+  return model.findByParentId(parentId);
+};
+
+module.exports = { getById, getByParentId, createFavorite, deleteFavorite };

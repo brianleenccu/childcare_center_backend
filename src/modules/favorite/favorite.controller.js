@@ -32,4 +32,13 @@ const remove = async (req, res) => {
   }
 };
 
-module.exports = { getById, create, remove };
+const getByParentId = async (req, res) => {
+  try {
+    const items = await service.getByParentId(req.params.parentId);
+    res.json(items);
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message });
+  }
+};
+
+module.exports = { getById, getByParentId, create, remove };

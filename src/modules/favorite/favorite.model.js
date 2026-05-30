@@ -30,4 +30,12 @@ const remove = async (id) => {
   );
 };
 
-module.exports = { findById, create, remove };
+const findByParentId = async (parentId) => {
+  const result = await pool.query(
+    `SELECT * FROM ${TABLE} WHERE parent_id = $1 ORDER BY added_at DESC`,
+    [parentId]
+  );
+  return result.rows;
+};
+
+module.exports = { findById, findByParentId, create, remove };
