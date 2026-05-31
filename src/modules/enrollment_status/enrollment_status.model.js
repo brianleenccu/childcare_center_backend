@@ -4,7 +4,7 @@ const TABLE = "enrollment_status";
 
 exports.getAllEnrollmentStatus = async () => {
   const result = await pool.query(
-    `SELECT * FROM ${TABLE} ORDER BY enrollment_id ASC`,
+    `SELECT * FROM ${TABLE} ORDER BY enrollment_id ASC`
   );
   return result.rows;
 };
@@ -12,7 +12,7 @@ exports.getAllEnrollmentStatus = async () => {
 exports.getEnrollmentStatusById = async (id) => {
   const result = await pool.query(
     `SELECT * FROM ${TABLE} WHERE enrollment_id = $1`,
-    [id],
+    [id]
   );
   return result.rows[0] || null;
 };
@@ -22,7 +22,7 @@ exports.getEnrollmentStatusByCenterId = async (centerId) => {
     `SELECT * FROM ${TABLE}
      WHERE center_id = $1
      ORDER BY enrollment_id ASC`,
-    [centerId],
+    [centerId]
   );
   return result.rows;
 };
@@ -40,15 +40,16 @@ exports.createEnrollmentStatus = async (record) => {
 
   const result = await pool.query(
     `INSERT INTO ${TABLE} (${columns}) VALUES (${params}) RETURNING *`,
-    values,
+    values
   );
 
   return result.rows[0];
 };
 
 exports.updateEnrollmentStatus = async (id, updates) => {
+  const { center_id, enrollment_id, ...safeUpdates } = updates;
   const payload = {
-    ...updates,
+    ...safeUpdates,
     updated_at: new Date().toISOString(),
   };
 
@@ -68,7 +69,7 @@ exports.updateEnrollmentStatus = async (id, updates) => {
      SET ${setClause}
      WHERE enrollment_id = $${keys.length + 1}
      RETURNING *`,
-    [...values, id],
+    [...values, id]
   );
 
   return result.rows[0] || null;
@@ -77,7 +78,7 @@ exports.updateEnrollmentStatus = async (id, updates) => {
 exports.deleteEnrollmentStatus = async (id) => {
   const result = await pool.query(
     `DELETE FROM ${TABLE} WHERE enrollment_id = $1 RETURNING *`,
-    [id],
+    [id]
   );
 
   return result.rows[0] || null;
